@@ -27,6 +27,14 @@ The application is designed for private organizational deployment: the server an
 
 According to the maintainer, the application is deployed within their workplace and is used by approximately **10 staff members**. The organization is not named, and no employee, payroll, or operational data is published in this repository.
 
+## Application screenshots
+
+The screenshots below show the Persian RTL interface using demonstration data. Personal identifiers have been redacted.
+
+![Payroll dashboard](docs/images/payroll-dashboard.jpg)
+
+![Payroll period closing and advances management](docs/images/payroll-settings.jpg)
+
 ## Technology
 
 - **Backend:** Node.js, Express
