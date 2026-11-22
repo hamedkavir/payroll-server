@@ -23,6 +23,10 @@ The application is designed for private organizational deployment: the server an
 - **Build-free client:** HTML, CSS, and ordered classic JavaScript files; no frontend build step is required.
 - **Client delivery optimization:** the server can serve a versioned JavaScript bundle and falls back to separate scripts if bundle validation fails.
 
+## Deployment and usage
+
+According to the maintainer, the application is deployed within their workplace and is used by approximately **10 staff members**. The organization is not named, and no employee, payroll, or operational data is published in this repository.
+
 ## Technology
 
 - **Backend:** Node.js, Express
