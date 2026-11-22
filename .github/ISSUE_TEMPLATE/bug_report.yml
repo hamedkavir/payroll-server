@@ -1,0 +1,49 @@
+name: Bug report
+description: Report a reproducible problem (do not include real personnel or payroll data).
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Remove all secrets and replace personal, payroll, bank, and organization data with synthetic examples. Never upload database dumps, backups, employee photos, or environment files.
+  - type: input
+    id: version
+    attributes:
+      label: Application version or commit
+      placeholder: v121 / commit SHA
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node.js version, MySQL version, browser (if relevant).
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest reproducible sequence using synthetic data.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs or screenshots
+      description: Remove tokens, credentials, names, national IDs, phone numbers, salaries, and bank details.
+    validations:
+      required: false
