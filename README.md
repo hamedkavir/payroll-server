@@ -139,6 +139,12 @@ GitHub Actions runs the test suite and JavaScript syntax checks on Node.js 22 an
 - [Development roadmap and verification notes](PLAN.md)
 - [Contributor/development notes](AGENTS.md)
 
+## Community and project policies
+
+- [Contributing guide](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+
 ## Contributing
 
 Issues and pull requests are welcome. Please:
