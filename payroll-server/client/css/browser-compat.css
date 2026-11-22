@@ -1,0 +1,74 @@
+/*
+ * browser-compat.css — Chrome 109 / Windows 7 fallback
+ * Loaded after theme.css. Only applies when color-mix() is unsupported.
+ * Newer browsers keep the original v115 appearance.
+ */
+@supports not (color: color-mix(in srgb, red, blue)) {
+  @media screen {
+    /* Legacy theme rules that also used color-mix(). */
+    .period-badge { border-color: rgba(20, 184, 166, .22); }
+    table.tbl tbody tr:nth-child(even) td { background: rgba(100, 116, 139, .055); }
+    table.tbl tbody tr:hover td { background: #e8f5f3; }
+    ::placeholder { color: #8792a4; }
+
+    html.ui-dark {
+      --ui-teal-soft: #203d43;
+      --ui-teal-ink: #78d4ca;
+    }
+    html.ui-dark .btn-del { border-color: rgba(239, 68, 68, .45); }
+    html.ui-dark .pf-dead { border-color: rgba(239, 68, 68, .4); }
+    html.ui-dark table.tbl tbody tr:nth-child(even) td { background: rgba(148, 163, 184, .07); }
+    html.ui-dark :is(table.tbl tbody tr:hover td, tr.clk:hover td, .lqRow.clk:hover) {
+      background: #203b42;
+    }
+    html.ui-dark ::placeholder { color: #8996aa; }
+
+    /* v115 refresh layer: replace unsupported mixed colors with safe colors. */
+    :root { --ui-surface-2: var(--line-2); }
+    body { background: var(--bg); }
+    .side { background: linear-gradient(180deg, var(--navy) 0%, var(--navy-2) 100%); }
+    .brand .logo { box-shadow: 0 4px 12px rgba(0, 0, 0, .22); }
+    .nav button { color: var(--ui-sb-fg); }
+    .nav button.on { background: rgba(255,255,255,.13); }
+    .conn .dot.on { box-shadow: 0 0 0 3px rgba(16,185,129,.25); }
+
+    .btn:hover:not(:disabled),
+    html.ui-dark .btn:hover:not(:disabled) { border-color: var(--muted); }
+    .btn-main:hover:not(:disabled),
+    .btn-blue:hover:not(:disabled) { box-shadow: 0 4px 10px rgba(16,29,56,.18); }
+    label.f input:hover:not(:focus),
+    label.f select:hover:not(:focus),
+    .inp:hover:not(:focus) { border-color: var(--muted); }
+    .chips button.on,
+    #setTabs button.on { box-shadow: 0 2px 6px rgba(16,29,56,.16); }
+
+    table.tbl tbody tr:nth-child(even) td { background: rgba(100,116,139,.045); }
+    table.tbl tbody tr:hover td { background: var(--ui-teal-soft); }
+    .badge { box-shadow: inset 0 0 0 1px rgba(100,116,139,.14); }
+    .modalWrap { background: rgba(16,29,56,.50); }
+
+    #loginWrap { background: var(--bg); }
+    #loginWrap .modalBox::before { box-shadow: 0 8px 20px rgba(20,184,166,.22); }
+
+    #page-dashboard .dash-hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+      box-shadow: 0 10px 28px rgba(16,29,56,.22);
+    }
+    #page-dashboard .dh-main p { color: rgba(255,255,255,.78); }
+    #page-dashboard .dh-chip { color: rgba(255,255,255,.92); }
+    #page-dashboard .btn-hero .kbd { color: rgba(255,255,255,.88); }
+    #page-dashboard .kpi { background: var(--card); }
+
+    /* Dark mode fallbacks. */
+    html.ui-dark body { background: var(--bg); }
+    html.ui-dark .side {
+      background: linear-gradient(180deg, #111c2d 0%, #070b12 100%);
+      border-inline-start-color: var(--line);
+    }
+    html.ui-dark #loginWrap { background: var(--bg); }
+    html.ui-dark #page-dashboard .dash-hero {
+      background: linear-gradient(135deg, #0f1a2b 0%, #14223a 100%);
+    }
+    html.ui-dark #page-dashboard .kpi .tile.t-blue { background: #263b57; color: #a9c6f2; }
+  }
+}

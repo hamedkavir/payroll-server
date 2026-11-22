@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment files and local secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local agent / machine-specific instructions
+CLAUDE.local.md
+
+# Runtime data, databases, backups and logs
+*.log
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.bak
+*.backup
+*.sql.gz
+payroll-server/backups/*
+!payroll-server/backups/.gitkeep
+payroll-server/pic/*
+!payroll-server/pic/README.txt

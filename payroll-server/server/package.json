@@ -1,0 +1,26 @@
+{
+  "name": "payslip-server",
+  "version": "34.0.0",
+  "description": "بک‌اند سیستم فیش حقوقی (Express + MySQL)",
+  "main": "app.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js",
+    "setup-db": "node setup-db.js",
+    "migrate": "node migrate.js up",
+    "migrate:status": "node migrate.js status",
+    "routes": "node routeTable.js",
+    "test": "node ../tests/run.js"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mysql2": "^3.11.0"
+  },
+  "engines": {
+    "node": ">=18.17"
+  }
+}

@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>سامانهٔ پرسنلی و وام</title>
+<!-- کتابخانهٔ اکسل (libs/xlsx.full.min.js) از نسخهٔ ۱۱۱ فقط هنگام نیاز بارگذاری می‌شود: js/core/xlsx-loader.js -->
+<style id="appCss">
+  @font-face {
+  font-family: "Vazirmatn";
+  src: url("./fonts/Vazirmatn-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("./fonts/Vazirmatn-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("./fonts/Vazirmatn-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("./fonts/Vazirmatn-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("./fonts/Vazirmatn-ExtraBold.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+:root{
+  --navy:#0f1b2d;--navy-2:#182a44;--navy-3:#233a5c;
+  --emerald:#0f9f6e;--emerald-soft:#dcf5ea;--emerald-ink:#066447;
+  --blue:#2563eb;--blue-soft:#e3ecff;
+  --amber:#f59e0b;--amber-soft:#fdf0d2;--amber-ink:#8a5a05;
+  --red:#ef4444;--red-soft:#fde4e4;--red-ink:#a32222;
+  --violet:#7c3aed;--violet-soft:#eee6fd;
+  --bg:#eef2f7;--card:#ffffff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--line-2:#f1f5f9;
+  --focus:#2563eb;
+  /* نام‌های قدیمی که در بخش‌هایی از اسکریپت و فیش استفاده شده‌اند */
+  --paper:#fff;--ink-2:var(--muted);--rule:var(--line);--rule-soft:var(--line-2);--tint:#f1f5f9;--panel:var(--card);--stamp:var(--red);--ok:var(--emerald);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:12px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Vazirmatn,"Segoe UI",Tahoma,sans-serif;font-size:14.5px;line-height:1.7}
+h1,h2,h3,h4{margin:0;font-weight:700}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ---------- قالب کلی: سایدبار سمت راست (راست‌چین) ---------- */
+.shell{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh}
+.side{background:var(--navy);color:#cbd5e1;padding:20px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:11px;padding:4px 8px 18px;border-bottom:1px solid var(--navy-3);margin-bottom:10px}
+.brand .logo{width:42px;height:42px;border-radius:11px;background:var(--amber);color:var(--navy);display:grid;place-items:center;flex-shrink:0}
+.brand b{display:block;color:#fff;font-size:15.5px;line-height:1.35}
+.brand span{font-size:11.5px;color:#8fa3bf}
+/* جمع‌شدن منوی کناری در دسکتاپ */
+@media (min-width:901px) {
+  .shell {
+    grid-template-columns: 252px minmax(0, 1fr);
+    transition: grid-template-columns .22s ease;
+  }
+
+  .shell.sidebar-collapsed {
+    grid-template-columns: 70px minmax(0, 1fr);
+  }
+
+  .sidebar-collapsed .side {
+    padding-inline: 8px;
+  }
+
+  .sidebar-collapsed .brand > div:last-child {
+    display: none;
+  }
+
+  .sidebar-collapsed .nav button {
+    justify-content: center;
+    padding-inline: 8px;
+    font-size: 0;
+  }
+
+  .sidebar-collapsed .nav button .kbd {
+    display: none;
+  }
+
+  .sidebar-collapsed .conn {
+    justify-content: center;
+    font-size: 0;
+  }
+
+  .sidebar-collapsed .desktop-menu-toggle {
+    justify-content: center;
+  }
+
+  .sidebar-collapsed .menu-toggle-label {
+    display: none;
+  }
+}
+
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav button{display:flex;align-items:center;gap:11px;width:100%;border:0;background:transparent;color:#cbd5e1;padding:11px 12px;border-radius:10px;cursor:pointer;text-align:start;font-weight:500;transition:background .15s,color .15s}
+.nav button:hover{background:var(--navy-2);color:#fff}
+.nav button.on{background:var(--emerald);color:#fff}
+.side .grow{flex:1}
+.conn{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:10px;background:var(--navy-2);font-size:12.5px;color:#cbd5e1}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--red);flex-shrink:0}
+.dot.on{background:#34d399}
+body.offline .nav button:not([data-page="settings"]){opacity:.4;pointer-events:none}
+
+.main{padding:18px 22px 40px;min-width:0}
+.head{background:var(--card);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 1px 2px rgba(15,23,42,.05);margin-bottom:16px}
+.head .t{flex:1;min-width:220px}
+.head h1{font-size:20px}
+.head p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+.period-badge{display:flex;align-items:center;gap:8px;background:var(--blue-soft);color:#1e40af;border-radius:999px;padding:4px 6px 4px 14px;font-size:13px}
+.period-badge select{border:0;background:transparent;font-weight:600;color:#1e40af;cursor:pointer;padding:4px 2px}
+.page{display:none}
+.page.on{display:block}
+
+.banner{border-radius:12px;padding:13px 18px;color:#fff;font-size:13px;margin-bottom:16px;line-height:1.9}
+.banner.blue{background:#1e3a8a}
+.banner.green{background:#0b5d47}
+.banner.brown{background:#7c3f10}
+
+.card{background:var(--card);border-radius:14px;padding:18px 20px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.card > h2{font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card > h2 .i{color:var(--muted)}
+.card p.sub{margin:-6px 0 12px;color:var(--muted);font-size:12.5px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.g-chart{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px}
+@media (max-width:1100px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g-chart,.g2{grid-template-columns:1fr}}
+
+/* کارت‌های آمار */
+.stat{background:var(--card);border-radius:14px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.stat small{display:block;color:var(--muted);font-size:12.5px}
+.stat b{display:block;font-size:27px;line-height:1.3;font-variant-numeric:tabular-nums}
+.tile{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;flex-shrink:0}
+.tile .i{width:23px;height:23px}
+.t-blue{background:var(--blue-soft);color:var(--blue)}
+.t-green{background:var(--emerald-soft);color:var(--emerald)}
+.t-amber{background:var(--amber-soft);color:#d97706}
+.t-violet{background:var(--violet-soft);color:var(--violet)}
+.t-red{background:var(--red-soft);color:var(--red)}
+.stat.v b{color:var(--violet)}
+
+/* نمودارها */
+.chart-box{width:100%;max-width:760px}
+.chart-box svg{width:100%;height:auto;display:block}
+.legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-inline-end:6px;vertical-align:-1px}
+.chart-empty{color:var(--muted);text-align:center;padding:40px 0;font-size:13px}
+
+/* جدول‌ها */
+.tbl-wrap{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:13px}
+table.tbl th{background:var(--line-2);color:var(--muted);font-weight:600;text-align:start;padding:10px 12px;white-space:nowrap}
+table.tbl th:first-child{border-start-start-radius:9px;border-end-start-radius:9px}
+table.tbl th:last-child{border-start-end-radius:9px;border-end-end-radius:9px}
+table.tbl td{padding:11px 12px;border-bottom:1px solid var(--line-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+table.tbl tr:last-child td{border-bottom:0}
+.badge{display:inline-block;border-radius:7px;padding:1px 10px;font-size:12px;font-weight:600}
+.b-green{background:var(--emerald-soft);color:var(--emerald-ink)}
+.b-amber{background:var(--amber-soft);color:var(--amber-ink)}
+.b-red{background:var(--red-soft);color:var(--red-ink)}
+.b-blue{background:var(--blue-soft);color:#1e40af}
+.money{color:var(--emerald-ink);font-weight:600}
+.empty{color:var(--muted);font-size:13.5px;text-align:center;padding:36px 16px;border:1px dashed var(--line);border-radius:12px;background:var(--card)}
+
+/* فرم‌ها و دکمه‌ها */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}
+label.f input,label.f select,.inp{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-size:14px;width:100%;color:var(--ink)}
+label.c{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink);margin-top:10px}
+.btn{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 16px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,opacity .15s}
+.btn:hover{background:var(--line-2)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn-main{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn-main:hover:not(:disabled){background:var(--navy-2)}
+.btn-blue{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-blue:hover:not(:disabled){background:#1d4fd0}
+.btn-green{background:var(--emerald);color:#fff;border-color:var(--emerald)}
+.btn-green:hover:not(:disabled){background:#0b8a5f}
+.btn-amber{background:var(--amber);color:#3b2600;border-color:var(--amber)}
+.btn-amber:hover:not(:disabled){background:#e08e00}
+.btn-quiet{background:transparent}
+.btn-del{color:var(--red-ink);border-color:#f3b8b8;background:#fff}
+.btn-del:hover{background:var(--red-soft)}
+.prow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.toolbar{background:var(--card);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.toolbar .inp{flex:1;min-width:180px}
+.filemeta{font-size:12.5px;color:var(--muted);line-height:1.9}
+.filemeta b{color:var(--ink)}
+
+/* کارت‌های بارگذاری فایل */
+.up{display:flex;flex-direction:column;gap:10px}
+.up .hd{display:flex;align-items:center;gap:12px}
+.up .hd h3{font-size:14.5px}
+.up .hd small{display:block;color:var(--muted);font-size:12px;font-weight:400}
+.drop{border:1.5px dashed #cbd5e1;border-radius:11px;padding:16px 12px;text-align:center;color:var(--muted);font-size:13px;cursor:pointer;background:#f8fafc;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--blue);background:var(--blue-soft);color:var(--ink)}
+.drop b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:2px}
+
+.console{background:#0b1424;color:#9fb3cf;border-radius:14px;padding:14px 16px;min-height:200px;max-height:300px;overflow:auto;font-size:12.5px;direction:rtl}
+.console .cap{color:#34d399;font-weight:700;margin-bottom:8px;display:flex;justify-content:space-between}
+.console .cap small{color:#5c7291;font-weight:400}
+.logLine{padding:2px 0;border-bottom:1px solid #15233a}
+.logEmpty{color:#5c7291}
+
+/* فهرست پرسنل و نوبت وام */
+.pf-layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1100px){.pf-layout{grid-template-columns:1fr}}
+.pf-side{position:sticky;top:12px;display:flex;flex-direction:column;gap:10px}
+@media (max-width:1100px){.pf-side{position:static}}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:4px 13px;font-size:12.5px;cursor:pointer;color:var(--muted);font-weight:600}
+.chips button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.plist{max-height:calc(100vh - 250px);min-height:200px;overflow:auto;font-size:13px}
+.plist .r{display:flex;gap:10px;align-items:center;padding:8px 9px;border-radius:11px;border:1px solid transparent;cursor:pointer}
+.plist .r:hover{background:var(--line-2)}
+.plist .r.sel{background:var(--blue-soft);border-color:#bfd2ff}
+.plist .r .nm{flex:1;min-width:0}
+.plist .r .nm b{display:block;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plist .r .nm span{color:var(--muted);font-size:11.5px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0;background:linear-gradient(135deg,#3b82f6,#1d4ed8)}
+.av.f{background:linear-gradient(135deg,#a855f7,#7c3aed)}
+.av.lg{width:78px;height:78px;font-size:30px;border:3px solid rgba(255,255,255,.35)}
+.pf-main{display:flex;flex-direction:column;gap:14px;min-width:0}
+.pf-hero{display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:linear-gradient(135deg,#0f1b2d,#233a5c 70%,#2b4f7d);color:#fff;border-radius:16px;padding:18px 22px}
+.pf-hero .who{flex:1;min-width:220px}
+.pf-hero h2{font-size:22px;margin:0 0 4px}
+.pf-hero .sub{color:#b9c8dd;font-size:13px;display:flex;gap:14px;flex-wrap:wrap}
+.pf-hero .net{text-align:left;background:rgba(255,255,255,.1);border-radius:13px;padding:10px 18px}
+.pf-hero .net small{display:block;color:#c7d6f0;font-size:11.5px}
+.pf-hero .net b{font-size:24px;color:#fcd34d;font-variant-numeric:tabular-nums}
+.pf-sec{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.pf-sec > h3{font-size:14.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pf-sec > h3 .i{color:var(--muted)}
+.pf-grid{display:flex;flex-wrap:wrap;gap:10px 12px}
+.fld{flex:1 1 200px;background:var(--line-2);border-radius:10px;padding:7px 12px;min-width:0}
+.fld.w2{flex-basis:340px}
+.fld small{display:block;color:var(--muted);font-size:11.5px}
+.fld b{font-weight:600;font-size:14px;word-break:break-word}
+.fld b.num{font-variant-numeric:tabular-nums;letter-spacing:.2px}
+.seg{display:inline-flex;background:var(--line-2);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg span{padding:4px 13px;border-radius:8px;font-size:12.5px;color:var(--muted)}
+.seg span.on{background:#fff;color:var(--ink);font-weight:700;box-shadow:0 1px 2px rgba(15,23,42,.12)}
+.seg span.on.green{background:var(--emerald);color:#fff}
+.seg span.on.amber{background:var(--amber);color:#3b2600}
+.seg span.on.red{background:var(--red);color:#fff}
+.seg span.on.blue{background:var(--blue);color:#fff}
+.segrow{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.segrow label{font-size:12px;color:var(--muted);margin-inline-end:6px}
+.mgrid{display:flex;flex-wrap:wrap;gap:10px}
+.mcard{flex:1 1 180px;min-width:0;overflow-wrap:anywhere;border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.mcard small{display:block;color:var(--muted);font-size:11.5px}
+.mcard b{font-size:17px;font-variant-numeric:tabular-nums}
+.mcard.hl{background:#ecfdf5;border-color:#a7f3d0}.mcard.hl b{color:var(--emerald-ink)}
+.mcard.vi{background:var(--violet-soft);border-color:#d9c8fb}.mcard.vi b{color:#5b21b6}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{position:relative;padding:6px 18px 6px 0;font-size:13px;border-inline-start:2px solid var(--line);margin-inline-start:6px;padding-inline-start:14px}
+.tl li::before{content:"";position:absolute;inset-inline-start:-6px;top:12px;width:10px;height:10px;border-radius:50%;background:var(--blue);border:2px solid #fff}
+.tl li span{color:var(--muted);font-size:11.5px;margin-inline-start:8px}
+.sec-empty{color:var(--muted);font-size:13px;padding:6px 0}
+.pf-sec > h3 .sp{flex:1}
+.btn.sm{padding:4px 12px;font-size:12.5px}
+.fld.ef{background:#fff;border:1px solid var(--line)}
+.fld.ef .inp{padding:6px 9px;margin-top:3px;font-size:13.5px}
+.fld.ro b{color:var(--muted)}
+.notes{white-space:pre-wrap;background:var(--line-2);border-radius:10px;padding:10px 12px;min-height:56px;font-size:13.5px;line-height:1.9}
+textarea.inp{min-height:120px;resize:vertical;line-height:1.9}
+.pf-msg{background:#ecfdf5;color:var(--emerald-ink);border:1px solid #a7f3d0;border-radius:11px;padding:8px 14px;font-size:13px}
+.pf-sec.editing{outline:2px solid #bfd2ff;outline-offset:0}
+tr.clk{cursor:pointer}
+tr.clk:hover td{background:#f8fafc}
+#empList{width:100%;border:1px solid var(--line);border-radius:10px;padding:4px;background:#fff;font-size:13px}
+#empList option{padding:6px 8px;border-radius:6px}
+.sum{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.sum b{font-variant-numeric:tabular-nums}
+.sum.total{border-bottom:0;font-weight:700;font-size:15px;padding-top:10px}
+.slips{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1100px){.slips{grid-template-columns:1fr}}
+.lqRow.clk{cursor:pointer}.lqRow.clk:hover{background:#f1f5f9}
+.lqRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--line-2);font-size:13px}
+.lqRow .lqInfo b{display:block}
+.lqRow .lqInfo span{color:var(--muted);font-size:12px}
+.lqRow .lqActs{display:flex;gap:6px;flex-shrink:0}
+.lqRow .lqActs .btn{padding:5px 11px;font-size:12px}
+.lqSectionTitle{font-size:13px;font-weight:700;color:var(--ink);margin:14px 0 4px}
+.dashItem{font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--line-2)}
+.dashEmpty{color:var(--muted);font-size:12.5px;padding:8px 0}
+.dashLists{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.dashLists h3{font-size:13px;margin-bottom:6px;color:var(--muted);font-weight:600}
+
+/* ---------- ورقهٔ فیش (سبک کلاسیک فشرده، مشترک بین صفحه و چاپ) ---------- */
+.sheet{background:#fff;color:#000;width:100%;max-width:860px;margin-inline:auto;border:1px solid var(--line);border-radius:10px;padding:8px 10px 6px;box-shadow:0 1px 2px rgba(15,23,42,.05);font-size:11px;line-height:1.5}
+.sheet-wrap{overflow-x:auto}
+/* نمایش روی صفحه (چاپ تغییر نمی‌کند: پنجرهٔ چاپ داخل #preview نیست) */
+#preview .sheet{max-width:860px;padding:16px 22px 12px;border-radius:16px;border:1px solid #dbe3ee;box-shadow:0 10px 30px rgba(15,23,42,.10);background:linear-gradient(#fff,#fcfdff)}
+#preview table.cl th{background:linear-gradient(#f3f6fa,#e3e9f1)}
+#preview table.cl tbody tr:nth-child(even) td{background:#fafbfd}
+#preview .gbox{background:#e6edf7;border-radius:5px}
+#preview table.sh-head{border-color:#64748b;border-radius:6px}
+#preview table.cl{border-color:#475569}
+table{width:100%;border-collapse:collapse;font-size:12px}
+.sheet .ttl{font-size:13.5px;font-weight:700}
+.sheet table.lay{border-collapse:collapse;width:100%;font-size:11px;table-layout:auto}
+.sheet table.lay td{padding:0;vertical-align:top;border:0}
+.sheet table.lay td.l{text-align:left;white-space:nowrap}
+.sheet .meta{font-size:10px;color:#444;line-height:1.6}
+.sh-idrow{font-weight:600;margin:2px 0}
+.sh-foot{margin-top:3px}
+.sh-foot td.totc{width:250px;padding-inline-start:12px}
+/* جمع‌ها: کادر کوچک با خط جداکننده بین ردیف‌ها */
+.sheet table.sh-tot{border:1px solid #475569;border-radius:4px;border-collapse:separate;border-spacing:0;overflow:hidden}
+.sheet .sh-tot td{padding:1px 8px;font-weight:600;font-size:10.5px;line-height:1.5;white-space:nowrap}
+.sheet .sh-tot tr+tr td{border-top:1px solid #94a3b8}
+.sheet .sh-tot td.l{text-align:left;font-variant-numeric:tabular-nums;font-weight:700;font-size:11px;border-inline-start:1px solid #cbd5e1}
+.sheet .sh-tot tr:last-child td{background:#e8edf4;font-size:11.5px;font-weight:700}
+.sheet .sh-tot tr:last-child td.l{font-size:12.5px}
+/* سربرگ فیش (سه ستون: مشخصات فرد | لوگو و دوره | مشخصات سازمانی) */
+table.sh-head{width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:3px;font-size:10px;table-layout:fixed}
+table.sh-head td{padding:2px 8px;vertical-align:middle;border:0}
+table.sh-head td.mid{width:22%;text-align:center;padding:1px 4px;line-height:1.3;font-size:10.5px}
+table.sh-head .hr{padding:0;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:clip}
+table.sh-head .hr b{font-weight:700}
+table.sh-head .sh-logo{height:30px;width:auto;display:block;margin:0 auto 1px}
+.sh-meta2{font-size:9px;color:#444;margin-bottom:3px;line-height:1.3}
+.sh-per{font-weight:700;font-size:12px}
+.sh-code{font-weight:600}
+.sh-extra{font-size:10px;color:#555;margin-bottom:4px}
+table.cl{table-layout:fixed;border:1.5px solid #000;font-size:10px}
+table.cl th{background:#ececec;border:1px solid #000;padding:1px 4px;font-weight:700;text-align:center;line-height:1.35}
+table.cl td{padding:0 4px;vertical-align:middle;line-height:1.38;white-space:nowrap;overflow:hidden;text-overflow:clip;border-inline-start:1px solid #999;border-bottom:1px solid #e3e3e3}
+table.cl td:first-child{border-inline-start:0}
+table.cl td.sep{border-inline-start:1.5px solid #000}
+table.cl td.a{text-align:right;font-variant-numeric:tabular-nums;padding-inline:3px}
+table.cl tr:last-child td{border-bottom:0}
+/* عنوان بلند: انتهای آن بریده می‌شود (یک خط)، کد داخل پرانتز همیشه دیده می‌شود */
+table.cl .lbl{display:flex;align-items:baseline;gap:3px;min-width:0}
+table.cl .lbl>.t{flex:1 1 auto;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:clip}
+table.cl .lbl>.cr{flex:none}
+.cr{color:#666;font-size:9px;white-space:nowrap;direction:ltr;unicode-bidi:isolate;display:inline-block}
+.sh-bank{line-height:1.75;font-size:10.5px}
+.gbox{display:inline-block;background:#e3e3e3;padding:0 6px;border-radius:2px;font-weight:700;vertical-align:middle;line-height:1.5}
+.sh-bank .gbox{min-width:0}
+.sh-words,.sh-emp{font-size:9px;color:#444;margin-top:2px;line-height:1.35}
+.sh-bank .sh-words{margin-top:1px}
+/* فشرده‌سازی خودکار برای جا شدن در A5 (از چاپ اندازه‌گیری و کلاس می‌گیرد) */
+.sheet.d1{font-size:9.5px}.sheet.d1 table.cl{font-size:9.5px}.sheet.d1 table.cl td{line-height:1.22}.sheet.d1 table.sh-head .hr{line-height:1.3}.sheet.d1 table.sh-head .sh-logo{height:26px}.sheet.d1 .sh-bank{line-height:1.5}.sheet.d1 table.lay,.sheet.d2 table.lay{font-size:inherit}
+.sheet.d2{font-size:9px}.sheet.d2 table.cl{font-size:9px}.sheet.d2 table.cl td{line-height:1.12;border-bottom-color:transparent}.sheet.d2 table.cl th{line-height:1.2}.sheet.d2 table.sh-head .hr{line-height:1.2}.sheet.d2 table.sh-head .sh-logo{height:22px}.sheet.d2 .sh-bank{line-height:1.35;font-size:9.5px}.sheet.d2 .sh-tot td{line-height:1.3}
+
+/* مودال‌های سفارشی */
+.modalWrap{position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:1000}
+.modalWrap[hidden]{display:none}
+.modalBox{background:#fff;border-radius:14px;max-width:560px;width:100%;max-height:85vh;overflow:auto;padding:20px;color:var(--ink);box-shadow:0 20px 50px rgba(15,23,42,.3)}
+.modalBox p{font-size:14px;line-height:1.9;margin:0 0 4px}
+.row-end{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+
+.mbar,.mscrim{display:none}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .mbar{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:60;background:var(--navy);color:#fff;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top,0px))}
+  .mbar button{border:0;background:rgba(255,255,255,.14);color:#fff;width:44px;height:44px;border-radius:12px;font-size:22px;line-height:1;cursor:pointer;flex-shrink:0}
+  .mbar b{flex:1;min-width:0;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mbar .mdot{width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0}.mbar .mdot.on{background:#34d399}
+  /* منو = کشوی کناری (از سمت راست) */
+  .side{position:fixed;top:0;bottom:0;inset-inline-start:0;width:min(86vw,320px);height:100dvh;z-index:80;transform:translateX(100%);transition:transform .22s ease,box-shadow .22s;padding:16px 12px calc(16px + env(safe-area-inset-bottom,0px))}
+  html[dir="ltr"] .side{transform:translateX(-100%)}
+  body.menu-open .side{transform:none;box-shadow:-8px 0 30px rgba(0,0,0,.35)}
+  .mscrim{display:block;position:fixed;inset:0;z-index:70;background:rgba(15,23,42,.55);opacity:0;pointer-events:none;transition:opacity .2s}
+  body.menu-open .mscrim{opacity:1;pointer-events:auto}
+  body.menu-open{overflow:hidden}
+  .nav button{padding:12px 12px;font-size:14.5px}
+  .main{padding:12px 10px 32px}
+  .head{padding:12px 14px;gap:8px;margin-bottom:12px}.head h1{font-size:16px;line-height:1.5}.head p{display:none}.head .t{min-width:0;flex:1 1 100%}
+  .period-badge{width:100%;justify-content:space-between}
+  .rp-tabs{top:58px;overflow-x:auto;flex-wrap:nowrap;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none}.rp-tabs::-webkit-scrollbar{display:none}.rp-tabs button{flex:0 0 auto}
+  .tbl-wrap{-webkit-overflow-scrolling:touch}
+  .wk-acts .btn,.row-end .btn{flex:1 1 auto;min-height:42px}
+  .navmodal{padding:2vh 8px}.navmodal .box{padding:12px}.nme-i{flex-wrap:wrap}.nme-i .o{min-width:0;flex:1 1 100%}
+  input,select,textarea{font-size:16px}
+}
+@media (max-width:640px){
+  .g4,.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .fgrid,.cap-form{grid-template-columns:1fr}
+  .card{padding-inline:12px}
+  .wk-sum{gap:6px}
+  .pf-hero{padding:14px}
+}
+@media (max-width:400px){.g4,.kpi-grid{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+@media print{ .side,.head,.mbar,.mscrim,.main > .page{display:none !important} body{background:#fff} }
+
+
+/* ---------- وام / مساعده / کالا / انبار ---------- */
+.pbar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:14px;padding:12px 16px}
+.pb-who{display:flex;gap:12px;align-items:center;flex:1;min-width:240px}
+.pb-who b{display:block;font-size:16px;line-height:1.5}
+.pb-who span{color:var(--muted);font-size:12.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pb-find{position:relative;width:300px;max-width:100%}
+.pb-res{position:absolute;top:100%;inset-inline:0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(15,23,42,.15);z-index:20;margin-top:4px;max-height:280px;overflow:auto}
+.pb-res button{display:block;width:100%;text-align:start;background:none;border:0;padding:8px 12px;cursor:pointer;font-size:13px}
+.pb-res button:hover,.pb-res button.on{background:var(--line-2)}
+.pb-res small{color:var(--muted);margin-inline-start:6px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.fgrid .span2{grid-column:span 2}
+.fgrid input[readonly]{background:var(--line-2)}
+input.ltr{direction:ltr;text-align:right}
+.wk-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.wk-acts .sp{flex:1}
+.radios{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:13.5px;margin-top:12px}
+.radios label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.kbd{font-size:11px;background:rgba(15,23,42,.1);border-radius:5px;padding:0 6px;margin-inline-start:4px;font-weight:600}
+.pf-acts{display:flex;gap:8px;flex-wrap:wrap;flex-basis:100%}
+.btn-hero{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.28)}
+.btn-hero:hover{background:rgba(255,255,255,.22)}
+.btn-hero .kbd{background:rgba(255,255,255,.22)}
+.hint{color:var(--muted);font-size:12.5px}
+.wk-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}
+.wk-sum div{background:var(--line-2);border-radius:10px;padding:8px 12px;font-size:12.5px;color:var(--muted)}
+.wk-sum b{display:block;font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums}
+.wk-sum .big b{color:var(--emerald-ink);font-size:18px}
+tr.selrow td{background:var(--blue-soft)}
+.wk-tbl-act{display:flex;gap:6px}
+.wk-tbl-act .btn{padding:3px 10px;font-size:12px}
+.wk-grid2{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.nav button .kbd{margin-inline-start:auto;background:rgba(255,255,255,.12);color:#cbd5e1}
+
+/* ---------- فرم‌های چاپی (اطلاعیه، دریافت وام، مساعده، کالا) ---------- */
+/* ---- ظاهر یکپارچهٔ همهٔ فرم‌های چاپی (مساعده، وام، امداد، کالا، لغو عضویت، نامهٔ خدمات) ---- */
+.doc{width:132mm;max-width:100%;margin:0 auto;color:#0f172a;font-size:10.5px;line-height:1.6;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.d-head{display:grid;grid-template-columns:1fr 70px 1fr;align-items:center;gap:6px;border-bottom:2px solid #1e293b;padding-bottom:5px;position:relative}
+.d-head:after{content:"";position:absolute;right:0;left:0;bottom:-5px;border-bottom:1px solid #cbd5e1}
+.d-r b{display:block;font-size:11.5px}
+.d-r span{font-size:10px;color:#475569}
+.d-c{text-align:center;font-size:9.5px;font-weight:700}
+.d-c img{height:40px;width:auto;display:block;margin:0 auto 1px}
+.d-l{font-size:10px;text-align:left;line-height:1.5;color:#334155}
+.d-title{text-align:center;font-size:15px;font-weight:800;margin:10px 0 6px;background:#f1f5f9;border:1px solid #cbd5e1;border-right:5px solid #1e293b;border-radius:9px;padding:2px 10px}
+.d-fg{display:grid;grid-template-columns:repeat(2,1fr);gap:4px}
+.d-fg+.d-fg{margin-top:4px}
+.d-fg.c3{grid-template-columns:repeat(3,1fr)}
+.d-fg.c4{grid-template-columns:repeat(4,1fr)}
+.d-fg.c5{grid-template-columns:repeat(5,1fr)}
+.d-fg .w2{grid-column:span 2}
+.d-fg .w3{grid-column:span 3}
+.d-fl{border:1px solid #cbd5e1;background:#f8fafc;border-radius:8px;padding:1px 6px;min-width:0}
+.d-fl small{display:block;color:#64748b;font-size:9px;line-height:1.4}
+.d-fl b{font-size:11.5px;font-weight:700;overflow-wrap:anywhere;color:#0f172a}
+.d-hl{border:1.5px solid #1e293b;background:#f1f5f9;border-radius:10px;padding:5px 9px;margin:6px 0;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:11.5px}
+.d-note{border:1px solid #cbd5e1;border-right:4px solid #94a3b8;background:#f8fafc;border-radius:8px;padding:5px 22px 5px 8px;margin:6px 0 0;font-size:10px}
+.d-p{margin:6px 0 0;text-align:justify}
+.d-sec{border:1px solid #94a3b8;border-radius:10px;padding:3px 8px;margin-top:6px;page-break-inside:avoid}
+.d-sec h3{font-size:10.5px;border-bottom:1px solid #e2e8f0;margin:0 0 2px;padding-bottom:1px;color:#1e293b}
+.d-sigs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.d-sigs.c4{grid-template-columns:repeat(4,1fr)}
+#lyDlg:not([hidden]){display:flex}#setGrid{grid-template-columns:minmax(0,1fr)!important;max-width:1000px}.sgHide{display:none!important}.dz-sec{border-top:1px solid var(--line);margin-top:12px;padding-top:8px}.dz-sec h3{margin:0 0 4px;font-size:14px}
+#lyDoc .ly-off{opacity:.3;outline:1px dashed #dc2626}#lyDoc .ly-sel{outline:2px solid #2563eb!important;outline-offset:1px}#lyDoc .d-fl,#lyDoc .doc>*{cursor:pointer}#lyDoc .d-fl:hover,#lyDoc .doc>*:hover{outline:1px dotted #2563eb}
+#lyTools{width:340px;flex:none;overflow:auto;background:#fffbeb;border-inline-end:1px solid var(--line);padding:10px 12px;font-size:13px}
+#lyTools .lyh{font-weight:800;color:#92400e;margin:10px 0 4px;padding-top:6px;border-top:1px dashed #d4b45a}#lyTools .lyh:first-child{border-top:0;margin-top:0;padding-top:0}
+#lyTools .lyr{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0}#lyTools .lyr label{display:flex;gap:4px;align-items:center}
+#lyTools input[type=number]{width:58px}#lyDoc.ly-guides .d-fl,#lyDoc.ly-guides .doc>*,#lyDoc.ly-guides .d-card>*{outline:1px dashed #94a3b8}
+#lyDoc .ly-sel2{outline:2px dashed #7c3aed!important;outline-offset:1px}
+.ly-ruler{position:absolute;z-index:30;pointer-events:none;color:#475569;font-size:9px;background-color:#f1f5f9}
+.ly-ruler.x{top:-1px;left:6mm;height:14px;transform:translateY(-100%);background-image:linear-gradient(to right,#cbd5e1 1px,transparent 1px),linear-gradient(to right,#64748b 1px,transparent 1px);background-size:1mm 4px,10mm 9px;background-repeat:repeat-x;background-position:0 100%}
+.ly-ruler.y{left:-1px;top:6mm;width:14px;transform:translateX(-100%);background-image:linear-gradient(to bottom,#cbd5e1 1px,transparent 1px),linear-gradient(to bottom,#64748b 1px,transparent 1px);background-size:4px 1mm,9px 10mm;background-repeat:repeat-y;background-position:100% 0}
+.ly-ruler.x span{position:absolute;top:0;padding-left:2px}.ly-ruler.y span{position:absolute;left:1px;padding-top:1px;writing-mode:vertical-rl}
+#lyDoc .ly-editing{outline:2px solid #16a34a!important;background:#f0fdf4;cursor:text}#lyDoc [data-slot]{cursor:text}
+.d-ctext{white-space:pre-wrap;line-height:1.9;margin-top:6px}
+.d-fl.sl.l{grid-column:3}
+.d-cline{border-top:1px solid #94a3b8;margin:4px 0;padding:4px 0 0}
+.doc{position:relative}.d-cbox{border:1px solid #94a3b8;border-radius:4px;min-height:18mm;margin-top:6px}.d-cimg{margin-top:6px}.d-cimg img{display:block;max-width:100%}
+#lyHdl{position:absolute;border:1px solid #2563eb;pointer-events:none;z-index:30}#lyHdl i{position:absolute;width:10px;height:10px;background:#fff;border:1.5px solid #2563eb;border-radius:3px;pointer-events:auto}
+#lyHdl i[data-h=nw]{left:-6px;top:-6px;cursor:nwse-resize}#lyHdl i[data-h=n]{left:calc(50% - 5px);top:-6px;cursor:ns-resize}#lyHdl i[data-h=ne]{right:-6px;top:-6px;cursor:nesw-resize}
+#lyHdl i[data-h=w]{left:-6px;top:calc(50% - 5px);cursor:ew-resize}#lyHdl i[data-h=e]{right:-6px;top:calc(50% - 5px);cursor:ew-resize}
+#lyHdl i[data-h=sw]{left:-6px;bottom:-6px;cursor:nesw-resize}#lyHdl i[data-h=s]{left:calc(50% - 5px);bottom:-6px;cursor:ns-resize}#lyHdl i[data-h=se]{right:-6px;bottom:-6px;cursor:nwse-resize}
+#lyDoc.ly-gridbg .doc{background-image:linear-gradient(to right,rgba(37,99,235,.10) 1px,transparent 1px),linear-gradient(to bottom,rgba(37,99,235,.10) 1px,transparent 1px);background-size:5mm 5mm}
+#lyRuler{height:14px;margin:0 auto 4px;background:repeating-linear-gradient(to right,#64748b 0 1px,transparent 1px 10mm),repeating-linear-gradient(to right,#cbd5e1 0 1px,transparent 1px 1mm);background-size:100% 14px,100% 6px;background-repeat:no-repeat;background-position:0 0,0 8px}
+.d-sigimg{margin-top:8px;text-align:left}.d-sigimg img{width:46mm;max-width:100%;display:inline-block}
+.cq-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}@media(max-width:1150px){.cq-grid{grid-template-columns:1fr}}
+.cq-sec{font-weight:700;font-size:13px;color:#334155;margin:12px 0 6px;padding-bottom:4px;border-bottom:1px dashed var(--line)}.cq-sec:first-of-type{margin-top:0}
+.cq-wrap{max-width:980px}.cq4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 16px}.cq4 .c2{grid-column:span 2}.cq4 .c3{grid-column:span 3}.cq4 .c4{grid-column:1/-1}.cq4 .f{margin:0}@media(max-width:760px){.cq4{grid-template-columns:repeat(2,minmax(0,1fr))}.cq4 .c3,.cq4 .c4{grid-column:1/-1}}
+.cq-side{position:sticky;top:12px}.cq-paper-wrap{background:#e2e8f0;border-radius:12px;padding:14px;overflow:hidden}.cq-paper{background:#fff;width:182mm;zoom:.5;margin:0 auto;box-shadow:0 2px 12px rgba(0,0,0,.2);min-height:250mm;padding:6mm;box-sizing:border-box}
+.doc.letter{font-size:15.5px;line-height:2.35;padding-top:4mm}.doc.letter .lt-top{text-align:left;font-size:13px;line-height:1.9}
+.doc.letter .lt-b{font-weight:700;margin:0}.doc.letter .lt-body{text-align:justify;margin-top:16px}
+.doc.letter .lt-signrow{display:flex;justify-content:space-between;align-items:flex-end;gap:12mm;margin-top:70px}
+.doc.letter .lt-sigbox{flex:1;text-align:left}.doc.letter .lt-sig{width:64mm;max-width:100%}.doc.letter .lt-by{text-align:center;font-weight:700;line-height:2;min-width:42mm}.d-cspace{height:14px}
+.d-sigs.c1{grid-template-columns:1fr}.d-sigs.c2{grid-template-columns:repeat(2,1fr)}.d-sigs.c5{grid-template-columns:repeat(5,1fr)}.d-sigs.c6{grid-template-columns:repeat(6,1fr)}
+.d-sig.hl{border:1.5px solid #1e293b;background:#fff2b8;color:#111;font-weight:800}
+.d-sig{border:1px solid #cbd5e1;border-radius:8px;min-height:46px;padding:2px 5px;font-size:10px;text-align:center;color:#475569}
+.d-stamp{width:80px;height:50px;border:1px dashed #94a3b8;border-radius:8px;display:grid;place-items:center;font-size:9.5px;color:#64748b;margin-inline-start:auto}
+.d-tbl{width:100%;border-collapse:collapse;font-size:10px;margin-top:4px}
+.d-tbl th,.d-tbl td{border:1px solid #94a3b8;padding:1px 5px;text-align:center}
+.d-tbl th{background:#e2e8f0}
+.d-foot{margin-top:6px;font-size:9.5px;color:#475569;display:flex;justify-content:space-between;border-top:1px solid #cbd5e1;padding-top:3px}
+.d-amt{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1.5px solid #1e293b;background:#f1f5f9;border-radius:10px;padding:5px 10px;margin:8px 0 0;font-size:12px}
+.d-amt b{font-size:14px;font-weight:800}
+.svc-frame{padding:0}
+.d-letter{white-space:pre-line;text-align:justify;line-height:1.9;margin:8px 0 0;font-size:11px}
+.d-pinfo{margin-top:10px}
+.d-foottext{white-space:pre-line;font-weight:700;line-height:1.9;margin-top:8px;font-size:11.5px;border:1px solid #cbd5e1;border-right:4px solid #1e293b;background:#f8fafc;border-radius:8px;padding:4px 10px}
+.d-greet{font-weight:800;margin-top:8px;font-size:12px}
+.doc.a4l{font-size:10.5px;line-height:1.45}.doc.a4l .d-sec{margin-top:4px;padding:2px 8px}.doc.a4l .d-title{margin:5px 0 3px;font-size:14px}.doc.a4l .d-head img{height:34px}.doc.a4l .d-tbl{font-size:9.5px}.doc.a4l .d-tbl td,.doc.a4l .d-tbl th{padding:1.5px 4px;line-height:1.35}.doc.a4l .d-sig{min-height:34px}.doc.a4l .d-fl{padding:1px 6px}.doc.a4l .d-foot{margin-top:3px}
+.doc.a4l.dd1{font-size:9.5px}.doc.a4l.dd1 .d-tbl{font-size:8.8px}.doc.a4l.dd1 .d-tbl td,.doc.a4l.dd1 .d-tbl th{padding:1px 3px;line-height:1.25}.doc.a4l.dd1 .d-sig{min-height:26px}.doc.a4l.dd1 .d-head img{height:26px}.doc.a4l.dd1 .d-title{margin:3px 0 2px}
+.doc.a4l.dd2{font-size:8.6px}.doc.a4l.dd2 .d-tbl{font-size:8px}.doc.a4l.dd2 .d-tbl td,.doc.a4l.dd2 .d-tbl th{padding:.5px 2px;line-height:1.15}.doc.a4l.dd2 .d-sig{min-height:20px}.doc.a4l.dd2 .d-sec{margin-top:2px}.doc.a4l.dd2 .d-head img{height:20px}
+.doc.a4{font-size:12.5px;line-height:1.75}.doc.a4 .d-sec{margin-top:10px}.doc.a4 .d-tbl td,.doc.a4 .d-tbl th{padding:6px 7px}.doc.a4 .d-stamp{height:52px}
+.doc.tight{font-size:10px;line-height:1.5}.doc.tight .d-sec{margin-top:4px}.doc.tight .d-p{margin-top:4px}.doc.tight .d-title{margin:7px 0 4px}.doc.tight .d-stamp{height:38px}
+.d-dots{display:inline-block;min-width:90px;border-bottom:1px dotted #444;height:1em;vertical-align:baseline}
+.d-fl.bar{display:flex;gap:8px;align-items:baseline;margin-top:5px;border-right:5px solid #94a3b8;border-radius:9px;padding:3px 10px;min-height:22px}
+.d-fl.bar small{display:inline;font-size:11px;color:#1e293b;font-weight:700;white-space:nowrap}.d-fl.bar small::after{content:":"}
+.d-fl.bar b{direction:ltr;unicode-bidi:isolate;font-weight:600;letter-spacing:.3px}
+.d-fl.tall b{display:block;min-height:15px}
+.d-hbar{border:1px solid #cbd5e1;border-right:5px solid #94a3b8;background:#f8fafc;border-radius:9px;padding:3px 10px;margin-top:6px;font-weight:700;font-size:11px}
+.d-hl.solo{justify-content:flex-start;font-weight:600}
+.d-box{border:1px solid #94a3b8;border-radius:10px;padding:5px 9px;margin-top:6px;page-break-inside:avoid}
+.doc.tight .d-sig{min-height:26px}
+.d-fg .w4{grid-column:span 4}
+.d-card{border:1.5px solid #1e5a7a;border-radius:16px;padding:6px 10px 8px;margin-top:8px;page-break-inside:avoid}
+.d-card-t{font-weight:700;font-size:12px;padding-bottom:3px;margin-bottom:6px;border-bottom:1.5px dashed #1aa3d4}
+.d-card .d-fg{margin-top:4px}
+.d-fl.sl{display:flex;gap:6px;align-items:baseline;border:none;background:none;padding:8px 0 0}
+.d-fl.sl small{display:inline;font-size:11px;color:#111;font-weight:600;white-space:nowrap}.d-fl.sl small::after{content:":"}
+.d-fl.sl b{flex:1;border-bottom:1px dotted #444;min-height:20px}
+
+/* ---------- ورود، کاربران، عکس، عضویت صندوق ---------- */
+.modalWrap[hidden]{display:none!important}
+.nav button[hidden]{display:none}
+.nav-group{display:flex;align-items:center;gap:6px;margin:14px 4px 3px;padding:5px 8px;font-size:11.5px;font-weight:700;color:#7f93ad;cursor:pointer;user-select:none;border-radius:6px;border-top:1px solid rgba(255,255,255,.07)}
+.nav-group:first-child{border-top:0;margin-top:4px}
+.nav-group:hover{color:#fff}.nav-group .ar{margin-inline-start:auto;font-size:10px;transition:transform .15s}.nav-group.col .ar{transform:rotate(90deg)}
+.nav button.navUserHide,.nav button.navCol:not(.on){display:none}
+.nav-tools{display:flex;gap:6px;margin-top:8px}
+.nav-tools button{flex:1;border:1px dashed rgba(255,255,255,.25);background:transparent;color:#94a3b8;border-radius:8px;padding:6px 8px;font-size:12px;cursor:pointer}
+.nav-tools button:hover{color:#fff;border-color:#fff}
+.nav-tools button.on{background:var(--emerald);border-color:var(--emerald);color:#fff}
+.nav.editing button{cursor:grab;outline:1px dashed rgba(255,255,255,.22)}
+.nav.editing button.dragging{opacity:.4}
+.nav.editing button.drop-before{box-shadow:0 -3px 0 var(--emerald)}
+.nav.editing button.drop-after{box-shadow:0 3px 0 var(--emerald)}
+.nav-mv{margin-inline-start:auto;display:flex;gap:2px}
+.nav-mv i{font-style:normal;font-size:11px;padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.14);cursor:pointer}
+.nav-mv i:hover{background:var(--emerald)}
+.nav.editing button .kbd{margin-inline-start:6px}
+.userbox{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--navy-2);color:#e2e8f0;font-size:12.5px}
+.userbox b{display:block;font-size:13px}
+.userbox small{color:#94a3b8}
+.userbox .ub-act{display:flex;gap:6px;margin-top:8px}
+.userbox button{flex:1;background:rgba(255,255,255,.1);color:#e2e8f0;border:0;border-radius:8px;padding:4px 6px;cursor:pointer;font:inherit;font-size:12px}
+.userbox button:hover{background:rgba(255,255,255,.2)}
+.av.has-photo{background:#e5e7eb;overflow:hidden;padding:0}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+.pf-hero .av.lg{width:104px;height:124px;border-radius:14px;font-size:34px}
+/* ---------- داشبورد ---------- */
+.dash-hero{background:linear-gradient(135deg,#0f1b2d 0%,#1e3a8a 62%,#2563eb 100%);color:#fff;border-radius:16px;padding:20px 24px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:16px;box-shadow:0 6px 18px rgba(30,58,138,.25)}
+.dh-main{flex:1;min-width:260px}
+.dh-main h2{font-size:21px;margin-bottom:2px;color:#fff}
+#dChartDonut svg{max-width:300px;margin:0 auto}
+#lqChart svg{max-height:380px}
+.dh-main p{margin:0;color:#c7d6f5;font-size:13px}
+.dh-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.dh-chip{background:rgba(255,255,255,.14);border-radius:999px;padding:3px 12px;font-size:12.5px}
+.dh-chip.warn{background:rgba(245,158,11,.28);color:#fde68a}
+button.dh-chip{border:0;color:inherit;cursor:pointer;font:inherit;font-size:12.5px}button.dh-chip:hover{background:rgba(255,255,255,.26)}
+.kc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.kc{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:linear-gradient(180deg,#fff,#f8fafc);transition:transform .15s,box-shadow .15s}
+.kc.clk{cursor:pointer}.kc.clk:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(15,23,42,.1)}
+.kc-h{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}.kc-h .code{margin-inline-start:auto;background:#eef2ff;color:#3730a3;border-radius:8px;padding:1px 9px;font-weight:700;font-size:12.5px}
+.kc b.v{display:block;font-size:22px;margin:6px 0 2px}.kc .sub{font-size:12px;color:var(--muted)}.kc .up{color:#dc2626}.kc .dn{color:#16a34a}
+.kc svg{display:block;margin-top:6px;width:100%;height:46px}.kc-off{border-style:dashed;background:#fafafa}
+.kpi.clk{transition:transform .15s,box-shadow .15s}.kpi.clk:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(15,23,42,.1)}
+.dh-acts{display:flex;gap:8px;flex-wrap:wrap}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:16px}
+.kpi{background:var(--card);border-radius:14px;padding:14px 16px;box-shadow:0 1px 2px rgba(15,23,42,.05);border-top:3px solid var(--line);transition:transform .12s,box-shadow .12s}
+.kpi.clk{cursor:pointer}.kpi.clk:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(15,23,42,.1)}
+.kpi.k-blue{border-top-color:var(--blue)}.kpi.k-green{border-top-color:var(--emerald)}.kpi.k-amber{border-top-color:var(--amber)}.kpi.k-violet{border-top-color:var(--violet)}.kpi.k-red{border-top-color:var(--red)}
+.kpi-t{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12.5px}
+.kpi-t .tile{width:36px;height:36px;border-radius:10px}.kpi-t .tile .i{width:19px;height:19px}
+.kpi b{display:block;font-size:26px;line-height:1.4;margin-top:6px;font-variant-numeric:tabular-nums}
+.kpi-sub{color:var(--muted);font-size:12px}
+.kpi.k-teal{border-top-color:#14b8a6}.kpi.k-teal .tile{background:#ccfbf1;color:#0f766e}
+.hb-row{display:grid;grid-template-columns:minmax(110px,1.1fr) minmax(0,2fr) auto;gap:10px;align-items:center;padding:5px 0;font-size:12.5px}
+.hb-row .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hb-row .nm small{color:var(--muted)}
+.hb-bar{height:10px;border-radius:6px;background:#eef2f7;overflow:hidden}.hb-bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#2563eb,#60a5fa)}
+.hb-row b{font-variant-numeric:tabular-nums;font-size:12.5px}
+.rp-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.rp-tabs button{border:1px solid var(--line);background:var(--card);padding:8px 16px;border-radius:999px;font:inherit;font-weight:700;cursor:pointer;color:var(--muted)}
+.rp-tabs button.on{background:#0f172a;color:#fff;border-color:#0f172a}
+.rp-tabs{position:sticky;top:0;z-index:20;background:var(--bg,#f4f6fa);padding:6px 0;margin-bottom:8px}
+.rp-tabs .wkl-entry{margin-inline-start:auto;border-style:dashed}
+.wkl-ctl{display:inline-flex;gap:3px;margin-inline-start:8px;vertical-align:middle;font-weight:400}
+.wkl-ctl i{font-style:normal;font-size:11px;padding:1px 6px;border-radius:5px;background:#e2e8f0;color:#0f172a;cursor:pointer}.wkl-ctl i:hover{background:var(--emerald);color:#fff}
+.wkl-bar{border:1px dashed var(--emerald);background:var(--emerald-soft,#ecfdf5);margin-bottom:12px}
+.wkl-bar .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.wkl-bar .chips i{font-style:normal;background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;cursor:pointer}
+.wklHide{display:none!important}
+.wklEdit .fgrid>.f{position:relative;outline:1px dashed #94a3b8;outline-offset:3px;border-radius:6px}
+.wkl-fctl{position:absolute;top:-13px;inset-inline-end:2px;display:flex;gap:1px;z-index:5;background:#fff;border:1px solid #cbd5e1;border-radius:7px;padding:0 2px;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.wkl-fctl i{font-style:normal;font-size:11px;padding:1px 5px;border-radius:5px;cursor:pointer;color:#0f172a}.wkl-fctl i:hover{background:var(--emerald);color:#fff}.wklDim{opacity:.5;outline:1px dashed #94a3b8}
+.navmodal{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow:auto}
+.navmodal .box{background:#fff;border-radius:16px;width:min(760px,100%);padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.nme-g{border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:10px;background:var(--line-2,#f8fafc)}
+.nme-gh,.nme-i{display:flex;gap:6px;align-items:center;margin-top:6px}.nme-gh input[type=text],.nme-i input[type=text]{flex:1;min-width:0}
+.nme-i{background:#fff;border-radius:8px;padding:4px 8px}.nme-i .o{color:var(--muted);font-size:11.5px;min-width:110px}
+.pal{width:min(560px,100%);background:#fff;border-radius:14px;padding:12px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.pal input{width:100%;font-size:15px;padding:10px 12px}.pal .li{display:flex;gap:8px;align-items:center;padding:9px 10px;border-radius:8px;cursor:pointer}.pal .li.on,.pal .li:hover{background:var(--emerald);color:#fff}.pal small{color:var(--muted);margin-inline-start:auto}.pal .li.on small{color:#fff}
+.pager{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0;font-size:12.5px;color:var(--muted)}
+.pager .btn{padding:4px 10px;min-height:0}.pager select{padding:3px 6px;width:auto}.pager .sp2{flex:1}
+.cap-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;align-items:end;margin-top:14px}
+.cap-kind{border:1px solid var(--line);border-radius:12px;padding:8px 14px 10px;display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin:0;background:var(--card)}
+.cap-kind legend{font-size:12px;color:var(--muted);padding:0 6px}
+.cap-kind label{display:flex;gap:6px;align-items:center;font-weight:700;font-size:13.5px;cursor:pointer}
+.cap-prev{margin-top:12px;padding:10px 14px;border-radius:12px;background:var(--blue-soft,#eff6ff);color:var(--blue-ink,#1e3a8a);font-size:13px;line-height:1.9}
+.cap-prev .bad{color:var(--red-ink,#991b1b);font-weight:700}
+.cap-tbl tr[data-act]{cursor:pointer}.cap-tbl tr.sel td{background:var(--blue-soft,#eff6ff)}
+.ded-tbl th,.ded-tbl td{white-space:nowrap}.ded-tbl tfoot td,#dc-table tfoot td{font-weight:800;background:#f1f5f9}
+.ded-tbl .up{color:#b91c1c}.ded-tbl .dn{color:#047857}
+.shbar{height:8px;border-radius:5px;background:#e2e8f0;min-width:70px;overflow:hidden}.shbar i{display:block;height:100%;background:#6366f1}
+.al-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;margin-bottom:6px;background:var(--line-2);font-size:13px}
+.al-row.clk{cursor:pointer}.al-row.clk:hover{background:#e8eef6}
+.al-row .dot2{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.al-row .dot2.a{background:var(--amber)}.al-row .dot2.r{background:var(--red)}.al-row .dot2.b{background:var(--blue)}.al-row .dot2.g{background:var(--emerald)}
+.al-row span.go{margin-inline-start:auto;color:var(--muted);font-size:12px}
+.since-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.since-grid>div{background:var(--line-2);border-radius:11px;padding:10px 12px;font-size:12.5px;color:var(--muted)}
+.since-grid b{display:block;font-size:18px;color:var(--ink)}
+.dl{border-radius:12px;padding:10px 12px;background:var(--line-2);border-top:3px solid var(--line)}
+.dl-g{border-top-color:var(--emerald)}.dl-a{border-top-color:var(--amber)}.dl-r{border-top-color:var(--red)}
+.who{display:flex;align-items:center;gap:10px}.who .av{width:34px;height:34px;font-size:12px}
+.qty-ctl{display:inline-flex;align-items:center;gap:6px}
+.qty-ctl .btn{padding:2px 11px;font-size:16px;line-height:1.3}
+.qty-in{width:84px;text-align:center;border:1px solid var(--line);border-radius:9px;padding:5px 6px;direction:ltr}
+.pf-hero.member{background:linear-gradient(135deg,#064e3b,#047857 65%,#10b981)}
+.pf-hero.nonmember{background:linear-gradient(135deg,#9b4450,#c26a74 65%,#d98a93)}
+.pf-hero.member .sub{color:#d1fae5}
+.pf-hero.nonmember .sub{color:#ffe4e6}
+.badge.b-member{background:#fff;color:#065f46;font-weight:700}
+.sample{display:inline-block;margin-top:6px;font-size:12.5px;color:#1d4ed8;text-decoration:none;font-weight:700}.sample:hover{text-decoration:underline}
+.stc{display:inline-flex;align-items:center;gap:6px;direction:rtl;unicode-bidi:isolate}.stc i{font-style:normal;color:var(--muted)}.stc b{font-weight:700}
+.pf-hero.st-active{background:linear-gradient(135deg,#14532d,#15803d 65%,#22c55e)!important}
+.pf-hero.st-ret{background:linear-gradient(135deg,#78350f,#b45309 65%,#f59e0b)!important}
+.pf-hero.st-heir{background:linear-gradient(135deg,#4c1d95,#6d28d9 65%,#8b5cf6)!important}
+.pf-hero.st-off{background:linear-gradient(135deg,#374151,#4b5563 65%,#6b7280)!important}
+.pf-hero.st-dead{background:linear-gradient(135deg,#000,#1f2937 65%,#3f3f46)!important}
+.pf-hero[class*="st-"] .sub{color:#e5e7eb!important}
+.plist .r{border-right:4px solid transparent}.plist .r.st-active{border-right-color:#3b82f6}.plist .r.st-ret{border-right-color:#f59e0b}.plist .r.st-heir{border-right-color:#8b5cf6}.plist .r.st-off{border-right-color:#9ca3af}.plist .r.st-dead{border-right-color:#111827}
+.badge.b-dark{background:#111827;color:#fff;font-weight:700}
+.pf-dead{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:10px;padding:8px 12px;margin-bottom:8px;font-weight:700}
+.pl-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:3px 0}.pl-row label{display:inline-flex;gap:4px;align-items:center}.pl-sub{margin:4px 22px 8px 0;border-right:2px solid var(--line);padding-right:10px}
+/* ---- utility classes (v114): replace repeated inline styles; !important keeps the old inline-style precedence ---- */
+.u-mb16{margin-bottom:16px !important}
+.u-mt12{margin-top:12px !important}
+.u-mt8{margin-top:8px !important}
+.u-mb8{margin-bottom:8px !important}
+.u-mb6{margin-bottom:6px !important}
+.u-mb14{margin-bottom:14px !important}
+.u-fs12{font-size:12px !important}
+.u-row8{flex-direction:row !important;align-items:center !important;gap:8px !important}
+.u-row6{flex-direction:row !important;align-items:center !important;gap:6px !important}
+.u-w170{width:170px !important}
+.u-m0b10{margin:0 0 10px !important}
+/* ---- utility classes (v117): static inline styles from the JS templates (client/js) ----
+   :where() keeps specificity at 0 and !important beats every normal rule — the same cascade result as the old
+   non-important inline style (it lost only to !important rules, and every other !important rule that sets these properties has specificity > 0 — re-check with tests/css_harness.py imp before adding a low-specificity !important rule).
+   Print documents (doc* builders) and print/forms.js, payslip/sheet.js keep their inline styles: the form designer edits el.style there. */
+/* margin */
+:where(.u-m-0-6){margin:0 6px !important}
+:where(.u-m-2-0){margin:2px 0 !important}
+:where(.u-m-3-0){margin:3px 0 !important}
+:where(.u-m-4-0){margin:4px 0 !important}
+:where(.u-m-6-0){margin:6px 0 !important}
+:where(.u-m-6-0-0){margin:6px 0 0 !important}
+:where(.u-m-8-0){margin:8px 0 !important}
+:where(.u-m-8-0-0){margin:8px 0 0 !important}
+:where(.u-m-8-18-0){margin:8px 18px 0 !important}
+:where(.u-m-10-0){margin:10px 0 !important}
+:where(.u-m-10-0-0){margin:10px 0 0 !important}
+:where(.u-m-10-0-4){margin:10px 0 4px !important}
+:where(.u-m-14-0-4){margin:14px 0 4px !important}
+:where(.u-m-14-0-6){margin:14px 0 6px !important}
+:where(.u-m-16-0-8){margin:16px 0 8px !important}
+:where(.u-m0){margin:0 !important}
+:where(.u-m0b4){margin:0 0 4px !important}
+:where(.u-m0b8){margin:0 0 8px !important}
+:where(.u-m0b12){margin:0 0 12px !important}
+:where(.u-m0b14){margin:0 0 14px !important}
+:where(.u-m2){margin:2px !important}
+:where(.u-mb4){margin-bottom:4px !important}
+:where(.u-mb10){margin-bottom:10px !important}
+:where(.u-mb12){margin-bottom:12px !important}
+:where(.u-ms8){margin-inline-start:8px !important}
+:where(.u-mt2){margin-top:2px !important}
+:where(.u-mt4){margin-top:4px !important}
+:where(.u-mt6){margin-top:6px !important}
+:where(.u-mt10){margin-top:10px !important}
+:where(.u-mt14){margin-top:14px !important}
+:where(.u-mt16){margin-top:16px !important}
+:where(.u-mt22){margin-top:22px !important}
+/* padding */
+:where(.u-p-2-10){padding:2px 10px !important}
+:where(.u-p-5-8){padding:5px 8px !important}
+:where(.u-p-5-10){padding:5px 10px !important}
+:where(.u-p-20-0){padding:20px 0 !important}
+:where(.u-p-24-0){padding:24px 0 !important}
+:where(.u-p10){padding:10px !important}
+:where(.u-p18){padding:18px !important}
+/* layout (display / flex / grid) */
+:where(.u-ai-center){align-items:center !important}
+:where(.u-ai-end){align-items:end !important}
+:where(.u-block){display:block !important}
+:where(.u-f1){flex:1 !important}
+:where(.u-f1-4){flex:1.4 !important}
+:where(.u-f2){flex:2 !important}
+:where(.u-flex){display:flex !important}
+:where(.u-frow){flex-direction:row !important}
+:where(.u-fwrap){flex-wrap:wrap !important}
+:where(.u-gap6){gap:6px !important}
+:where(.u-gap8){gap:8px !important}
+:where(.u-gap14){gap:14px !important}
+:where(.u-grid){display:grid !important}
+:where(.u-gtc-1){grid-template-columns:1fr !important}
+:where(.u-gtc-fit260){grid-template-columns:repeat(auto-fit,minmax(260px,1fr)) !important}
+:where(.u-gtc-fit300){grid-template-columns:repeat(auto-fit,minmax(300px,1fr)) !important}
+:where(.u-gtc-fit380){grid-template-columns:repeat(auto-fit,minmax(380px,1fr)) !important}
+:where(.u-iblock){display:inline-block !important}
+:where(.u-iflex){display:inline-flex !important}
+:where(.u-inline){display:inline !important}
+:where(.u-jc-end){justify-content:flex-end !important}
+/* size */
+:where(.u-maxh46vh){max-height:46vh !important}
+:where(.u-maxh50vh){max-height:50vh !important}
+:where(.u-maxh100p){max-height:100% !important}
+:where(.u-maxh160){max-height:160px !important}
+:where(.u-maxh250){max-height:250px !important}
+:where(.u-maxh320){max-height:320px !important}
+:where(.u-maxh340){max-height:340px !important}
+:where(.u-maxw100p){max-width:100% !important}
+:where(.u-maxw190){max-width:190px !important}
+:where(.u-maxw210){max-width:210px !important}
+:where(.u-maxw240){max-width:240px !important}
+:where(.u-maxw260){max-width:260px !important}
+:where(.u-maxw320){max-width:320px !important}
+:where(.u-maxw360){max-width:360px !important}
+:where(.u-minh18){min-height:18px !important}
+:where(.u-minh70){min-height:70px !important}
+:where(.u-minh80){min-height:80px !important}
+:where(.u-minh90){min-height:90px !important}
+:where(.u-minw0){min-width:0 !important}
+:where(.u-minw90){min-width:90px !important}
+:where(.u-minw150){min-width:150px !important}
+:where(.u-minw160){min-width:160px !important}
+:where(.u-minw180){min-width:180px !important}
+:where(.u-minw200){min-width:200px !important}
+:where(.u-minw220){min-width:220px !important}
+:where(.u-minw230){min-width:230px !important}
+:where(.u-w18){width:18px !important}
+:where(.u-w64){width:64px !important}
+:where(.u-w100p){width:100% !important}
+:where(.u-w150){width:150px !important}
+/* text */
+:where(.u-bidi-iso){unicode-bidi:isolate !important}
+:where(.u-c-047857){color:#047857 !important}
+:where(.u-c-amber-ink){color:var(--amber-ink) !important}
+:where(.u-c-b91c1c){color:#b91c1c !important}
+:where(.u-c-emerald-ink){color:var(--emerald-ink) !important}
+:where(.u-c-fff){color:#fff !important}
+:where(.u-c-green-ink){color:var(--green-ink,#166534) !important}
+:where(.u-c-muted){color:var(--muted) !important}
+:where(.u-c-red){color:var(--red,#c0392b) !important}
+:where(.u-c-red-ink){color:var(--red-ink) !important}
+:where(.u-fs11-5){font-size:11.5px !important}
+:where(.u-fs12-5){font-size:12.5px !important}
+:where(.u-fs14){font-size:14px !important}
+:where(.u-fs16){font-size:16px !important}
+:where(.u-fw400){font-weight:400 !important}
+:where(.u-fw700){font-weight:700 !important}
+:where(.u-lh1-8){line-height:1.8 !important}
+:where(.u-lh1-9){line-height:1.9 !important}
+:where(.u-ltr){direction:ltr !important}
+:where(.u-nowrap){white-space:nowrap !important}
+:where(.u-pointer){cursor:pointer !important}
+:where(.u-ta-center){text-align:center !important}
+:where(.u-ta-left){text-align:left !important}
+:where(.u-ta-right){text-align:right !important}
+:where(.u-ws-normal){white-space:normal !important}
+/* box (background / border / radius / overflow / opacity) */
+:where(.u-bd1-line){border:1px solid var(--line) !important}
+:where(.u-bdb1-line){border-bottom:1px solid var(--line) !important}
+:where(.u-bds4-blue){border-inline-start:4px solid var(--blue) !important}
+:where(.u-bg-amber-soft){background:var(--amber-soft) !important}
+:where(.u-bg-f1f5f9){background:#f1f5f9 !important}
+:where(.u-bg-f8fafc){background:#f8fafc !important}
+:where(.u-bg-fff){background:#fff !important}
+:where(.u-bg-line-2){background:var(--line-2) !important}
+:where(.u-bg-red-soft){background:var(--red-soft) !important}
+:where(.u-op55){opacity:.55 !important}
+:where(.u-op60){opacity:.6 !important}
+:where(.u-ovf-auto){overflow:auto !important}
+:where(.u-r8){border-radius:8px !important}
+:where(.u-r12){border-radius:12px !important}
+</style>
+<link rel="preload" href="./fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="./css/theme.css?v=120">
+<link rel="stylesheet" href="./css/browser-compat.css?v=116">
+<!-- حالت تیره پیش از نمایش صفحه اعمال می‌شود (بدون چشمک صفحهٔ روشن)؛ منطق کامل: js/ui/appearance.js -->
+<script>(function(){try{var a=JSON.parse(localStorage.getItem("psAppearance")||"{}"),d=a.dark===true||(a.dark==="auto"&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);if(d)document.documentElement.classList.add("ui-dark")}catch(e){}})();</script>
+
+
+</head>
+<body class="offline">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4M12 15v2"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/></symbol>
+    <symbol id="i-dash" viewBox="0 0 24 24"><path d="M21 12A9 9 0 1 1 12 3v9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M17 14c2.3 0 4 1.8 4 4.2"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
+    <symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.100 2.100M17 17l2.100 2.100M4.900 19.100L7 17M17 7l2.100-2.100"/></symbol>
+    <symbol id="i-usercheck" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6 1.300 0 2.500.4 3.500 1.100"/><path d="M15 17l2 2 4-4"/></symbol>
+    <symbol id="i-userclock" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6"/><circle cx="17" cy="17" r="4"/><path d="M17 15v2l1.500 1"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3h10v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v7H7z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3.500 6h.01M3.500 12h.01M3.500 18h.01"/></symbol>
+    <symbol id="i-id" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="12" r="2"/><path d="M14 10h4M14 14h4M6 17c.6-1.500 1.800-2 3-2s2.400.5 3 2"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.500"/><path d="M3 10h18"/><circle cx="16.500" cy="14.500" r="1.200"/></symbol>
+    <symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v5M15 3v5M6 8h12v3a6 6 0 0 1-12 0zM12 17v4"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h6"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-chev-d" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-chevs-r" viewBox="0 0 24 24"><path d="M13 7l5 5-5 5M6 7l5 5-5 5"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.500 6.500l4 4"/></symbol>
+    <symbol id="i-userx" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6"/><path d="M15 15l5 5M20 15l-5 5"/></symbol>
+    <symbol id="i-school" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.500V16c0 1.500 2.700 3 6 3s6-1.500 6-3v-4.500M22 9v5"/></symbol>
+    <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/></symbol>
+    <symbol id="i-lifebuoy" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.500"/><path d="M5.600 5.600l3.900 3.900M14.500 14.500l3.900 3.900M18.400 5.600l-3.900 3.900M9.500 14.500l-3.900 3.900"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="2.500" y="5" width="19" height="14" rx="2.500"/><path d="M2.500 10h19M6 15h4"/></symbol>
+    <symbol id="i-cheque" viewBox="0 0 24 24"><rect x="2.500" y="6" width="19" height="12" rx="2"/><path d="M6 10h8M6 13.500h4"/><path d="M13 15.500l1.500-2 1.500 2 1.500-2 1 1.500"/></symbol>
+    <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 9l9-5 9 5z"/><path d="M5 9v8M9.500 9v8M14.500 9v8M19 9v8M3 20h18"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.400"/><circle cx="17" cy="20" r="1.400"/><path d="M2.500 4h3l2.200 11h10.300l2-8H6.500"/></symbol>
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 4v14M3.500 14.500L7 18l3.500-3.500M17 20V6M13.500 9.500L17 6l3.500 3.500"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.500-4.500-7.500-10A4.200 4.200 0 0 1 12 7.500 4.200 4.200 0 0 1 19.500 10c0 5.500-7.500 10-7.500 10z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.500-3.300 7.700-8 9-4.700-1.300-8-4.500-8-9V6z"/><path d="M8.500 12l2.500 2.500 4.500-5"/></symbol>
+    <symbol id="i-hash" viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M10 4L8 20M16 4l-2 16"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1.500"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M10 21v-4h4v4"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7.500L12 3l9 4.500v9L12 21l-9-4.500z"/><path d="M3 7.500L12 12l9-4.500M12 12v9"/></symbol>
+  </defs>
+</svg>
+
+<div class="mbar"><button id="mMenu" type="button" aria-label="باز کردن منو" aria-expanded="false"><svg class="i ci"><use href="#i-menu"/></svg></button><b id="mTitle">سامانهٔ پرسنلی و وام</b><span class="mdot" id="mDot" title="اتصال به سرور"></span></div>
+<div class="mscrim" id="mScrim"></div>
+<div class="shell">
+  <aside class="side">
+    <button
+      id="desktopMenuToggle"
+      class="desktop-menu-toggle"
+      type="button"
+      aria-label="جمع کردن منو"
+      title="جمع کردن منو"
+      aria-expanded="true"
+    >
+      <span aria-hidden="true"><svg class="i ci edge"><use href="#i-chevs-r"/></svg></span>
+      <span class="menu-toggle-label">جمع کردن منو</span>
+    </button>
+    <div class="brand">
+      <div class="logo"><svg class="i"><use href="#i-wallet"/></svg></div>
+      <div><b>سامانهٔ پرسنلی و وام</b><span>نسخهٔ تیمی — پایگاه‌دادهٔ مرکزی</span></div>
+    </div>
+
+    <nav class="nav">
+      <button data-page="dashboard" class="on"><svg class="i"><use href="#i-dash"/></svg>داشبورد مدیریتی</button>
+      <button data-page="import"><svg class="i"><use href="#i-upload"/></svg>تغذیهٔ فایل‌های اکسل</button>
+      <button data-page="personnel"><svg class="i"><use href="#i-id"/></svg>پرسنل<span class="kbd">F2</span></button>
+      <button data-page="deceased"><svg class="i"><use href="#i-userx"/></svg>درگذشتگان</button>
+      <button data-page="schools"><svg class="i"><use href="#i-school"/></svg>مدارس و آموزشگاه‌ها</button>
+      <button data-page="statushistory"><svg class="i"><use href="#i-userclock"/></svg>تاریخچهٔ تغییر وضعیت</button>
+      <button data-page="slips"><svg class="i"><use href="#i-receipt"/></svg>فیش حقوقی<span class="kbd">F3</span></button>
+      <button data-page="loans"><svg class="i"><use href="#i-coins"/></svg>گزارش وام</button>
+      <button data-page="loanform"><svg class="i"><use href="#i-print"/></svg>ثبت وام و چاپ فرم‌ها<span class="kbd">F8</span></button>
+      <button data-page="vefagh"><svg class="i"><use href="#i-scale"/></svg>وام وفاق</button>
+      <button data-page="advance"><svg class="i"><use href="#i-wallet"/></svg>مساعده (وام کوتاه‌مدت)<span class="kbd">F6</span></button>
+      <button data-page="emdad"><svg class="i"><use href="#i-lifebuoy"/></svg>وام امداد</button>
+      <button data-page="mehr"><svg class="i"><use href="#i-card"/></svg>وام بانک مهر<span class="kbd">⇧F8</span></button>
+      <button data-page="cheque"><svg class="i"><use href="#i-cheque"/></svg>صدور دسته چک</button>
+      <button data-page="banks"><svg class="i"><use href="#i-bank"/></svg>تعریف بانک‌ها</button>
+      <button data-page="goods"><svg class="i"><use href="#i-cart"/></svg>درخواست کالا (اقساطی)<span class="kbd">F7</span></button>
+      <button data-page="services"><svg class="i"><use href="#i-briefcase"/></svg>درخواست خدمات (موسسات)<span class="kbd">F9</span></button>
+      <button data-page="changes"><svg class="i"><use href="#i-swap"/></svg>تغییرات ماهانهٔ کسورات<span class="kbd">F10</span></button>
+      <button data-page="life"><svg class="i"><use href="#i-heart"/></svg>بیمه عمر</button>
+    <button data-page="insurance"><svg class="i"><use href="#i-shield"/></svg>بیمه تکمیلی<span class="kbd">F11</span></button>
+      <button data-page="dcodes"><svg class="i"><use href="#i-hash"/></svg>تعریف کد کسر</button>
+      <button data-page="institutions"><svg class="i"><use href="#i-building"/></svg>تعریف موسسات و نامه‌ها</button>
+      <button data-page="inventory"><svg class="i"><use href="#i-box"/></svg>انبارداری</button>
+      <button data-page="reports"><svg class="i"><use href="#i-chart"/></svg>گزارش‌های مالی</button>
+      <button data-page="closing"><svg class="i"><use href="#i-lock"/></svg>بستن فایل حقوق</button>
+      <button data-page="users" hidden><svg class="i"><use href="#i-users"/></svg>مدیریت کاربران</button>
+      <button data-page="settings"><svg class="i"><use href="#i-gear"/></svg>اتصال و تنظیمات</button>
+    </nav>
+    <div class="nav-tools"><button id="navEdit" type="button" title="جابه‌جایی منوها با کشیدن یا فلش‌ها"><svg class="i ci"><use href="#i-edit"/></svg> ویرایش منو</button><button id="navReset" type="button" hidden>بازنشانی ترتیب</button></div>
+    <div class="grow"></div>
+    <div class="conn"><span class="dot" id="connDot"></span><span id="connText">متصل نیست</span></div>
+    <div class="userbox" id="userBox" hidden><b id="ubName"></b><small id="ubRole"></small><div class="ub-act"><button id="ubPw">تغییر رمز</button><button id="ubOut">خروج</button></div></div>
+  </aside>
+
+  <main class="main">
+    <header class="head">
+      <div class="t">
+        <h1 id="pageTitle">داشبورد مدیریتی</h1>
+        </div>
+      <div class="period-badge"><span>دورهٔ فعال:</span><select id="periodSelect" aria-label="دورهٔ فعال"></select></div>
+    </header>
+
+    <!-- ===== داشبورد ===== -->
+    <section class="page on" id="page-dashboard">
+      <div class="dash-hero">
+        <div class="dh-main"><h2 id="dGreet">داشبورد مدیریتی</h2><p id="dDate"></p><div class="dh-chips" id="dChips"></div></div>
+        <div class="dh-acts" id="dActs"></div>
+      </div>
+      <div class="kpi-grid" id="dKpis"></div>
+      <div class="kpi-grid" id="dPayKpis"></div>
+      <div class="card u-mb16" ><h2><svg class="i"><use href="#i-coins"/></svg>خلاصهٔ کدهای مهم (تنظیمات ← تعریف کدهای مهم)<span style="flex:1"></span><span class="hint" id="dKcMonth" style="font-weight:400"></span></h2><div class="kc-grid" id="dKeyCodes"></div></div>
+      <div class="g-chart u-mb16" >
+        <div class="card"><h2><svg class="i"><use href="#i-chart"/></svg>روند حقوق ماه‌های اخیر</h2><div class="chart-box" id="dChartTrend"></div></div>
+        <div class="card"><h2><svg class="i"><use href="#i-coins"/></svg>کسورات برتر دورهٔ فعال</h2><div id="dTopDed"></div></div>
+      </div>
+      <div class="g2 u-mb16" >
+        <div class="card"><h2><svg class="i"><use href="#i-list"/></svg>وضعیت داده‌های دورهٔ فعال</h2><div id="dChecklist"></div></div>
+        <div class="card"><h2><svg class="i"><use href="#i-userclock"/></svg>تغییر وضعیت‌های دورهٔ فعال</h2><div id="dStatusMonth"></div></div>
+      </div>
+      <div class="g-chart u-mb16" >
+        <div class="card"><h2><svg class="i"><use href="#i-dash"/></svg>تفکیک وضعیت پرسنل</h2><div class="chart-box" id="dChartDonut"></div></div>
+        <div class="card"><h2><svg class="i"><use href="#i-chart"/></svg>پیش‌بینی نوبت وام (۶ ماه آینده)</h2><div class="chart-box" id="dChartBars"></div></div>
+      </div>
+      <div class="g2 u-mb16" >
+        <div class="card"><h2><svg class="i"><use href="#i-alert"/></svg>نیازمند توجه</h2><div id="dAlerts"></div></div>
+        <div class="card"><h2><svg class="i"><use href="#i-lock"/></svg>از آخرین بستن حقوق تا امروز</h2><div id="dSince"></div></div>
+      </div>
+      <div class="card u-mb16" >
+        <h2><svg class="i"><use href="#i-list"/></svg>آخرین واجدین وام (پایان اقساط کد ۷۱۰)</h2>
+        <div class="tbl-wrap" id="dEligibleBody"></div>
+      </div>
+      <div class="card">
+        <h2><svg class="i"><use href="#i-users"/></svg>آخرین تغییر وضعیت‌ها</h2>
+        <div class="dashLists">
+          <div class="dl dl-g"><h3>تازه شاغل شده‌اند</h3><div id="dListActive"></div></div>
+          <div class="dl dl-a"><h3>تازه بازنشسته شده‌اند</h3><div id="dListRetired"></div></div>
+          <div class="dl dl-r"><h3>تازه قطع رابطه شده‌اند</h3><div id="dListTerminated"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== تغذیهٔ فایل‌ها ===== -->
+    <section class="page" id="page-import">
+      <div class="banner green"><b>راهنمای تغذیهٔ دیتابیس:</b> فایل‌های اکسل هر دوره را اینجا بدهید. پس از پردازش، وضعیت پرسنل (شاغل / بازنشسته / وظیفه بگیر / قطع رابطه) خودکار به‌روز می‌شود و برای افرادی که قسط کد ۷۱۰ آن‌ها تمام شده، نوبت وام ثبت می‌شود. برای تشخیص «قطع رابطه»، هر دو فایل شاغلین و بازنشستگان همان دوره لازم است.</div>
+
+      <div class="card u-mb16" >
+        <h2><svg class="i"><use href="#i-plug"/></svg>مدیریت دوره</h2>
+        <div class="prow">
+          <label class="f u-w170" >ماه<select id="newMonth"></select></label>
+          <label class="f" style="width:130px">سال<input id="newYear" type="number" min="1390" max="1450"></label>
+          <button class="btn btn-blue" id="btnNewPeriod" style="align-self:flex-end">رفتن به این دوره / ساخت دوره</button>
+          <button class="btn btn-del" id="btnDelPeriod" style="align-self:flex-end">حذف دورهٔ فعال</button>
+        </div>
+        <div class="filemeta u-mt8" id="periodHint" >ماه و سال را انتخاب کنید؛ اگر چنین دوره‌ای نبود ساخته می‌شود.</div>
+      </div>
+
+      <div class="g2 u-mb16" >
+        <div class="card up">
+          <div class="hd"><div class="tile t-blue"><svg class="i"><use href="#i-id"/></svg></div><div><h3>۱. فایل کارگزینی</h3><small>بانک اطلاعات ثابت پرسنل — هر زمان تغییر کرد دوباره بدهید</small></div></div>
+          <input type="file" id="personnelFile" accept=".xlsx,.xlsm,.xls,.csv" hidden>
+          <div class="drop" id="dropPersonnel"><b>فایل کارگزینی را رها کنید</b>یا برای انتخاب کلیک کنید</div>
+          <a href="#" class="sample" data-sample="personnel">⬇ دانلود فایل نمونه (Excel)</a>
+          <div class="filemeta" id="personnelMeta">فایلی وارد نشده است.</div>
+        </div>
+        <div class="card up">
+          <div class="hd"><div class="tile t-green"><svg class="i"><use href="#i-file"/></svg></div><div><h3>۲. فایل حقوق شاغلین</h3><small>حقوق، مزایا و کسورات ماهانهٔ کارکنان شاغل</small></div></div>
+          <input type="file" id="activeFile" accept=".xlsx,.xlsm,.xls,.csv" hidden>
+          <div class="drop" id="dropActive"><b>فایل حقوق شاغلین را رها کنید</b>یا برای انتخاب کلیک کنید</div>
+          <a href="#" class="sample" data-sample="active">⬇ دانلود فایل نمونه (Excel)</a>
+          <div class="filemeta" id="activeMeta">فایلی افزوده نشده است.</div>
+        </div>
+        <div class="card up">
+          <div class="hd"><div class="tile t-amber"><svg class="i"><use href="#i-userclock"/></svg></div><div><h3>۳. فایل بازنشستگان</h3><small>ریز مزایا و کسورات ردیفی بازنشستگان</small></div></div>
+          <input type="file" id="retFile" accept=".xlsx,.xlsm,.xls,.csv" hidden>
+          <div class="drop" id="dropRet"><b>فایل بازنشستگان را رها کنید</b>یا برای انتخاب کلیک کنید</div>
+          <a href="#" class="sample" data-sample="retiree">⬇ دانلود فایل نمونه (Excel)</a>
+          <div class="filemeta" id="retMeta">فایلی افزوده نشده است.</div>
+        </div>
+        <div class="card up">
+          <div class="hd"><div class="tile t-violet"><svg class="i"><use href="#i-coins"/></svg></div><div><h3>۴. گزارش کسر اقساط شاغلین</h3><small>ریز وام‌ها و مانده — لازم برای تشخیص اتمام قسط کد ۷۱۰</small></div></div>
+          <input type="file" id="loanFile" accept=".xlsx,.xlsm,.xls,.csv" hidden>
+          <div class="drop" id="dropLoan"><b>فایل گزارش اقساط را رها کنید</b>یا برای انتخاب کلیک کنید</div>
+          <a href="#" class="sample" data-sample="loan">⬇ دانلود فایل نمونه (Excel)</a>
+          <div class="filemeta" id="loanMeta">فایلی افزوده نشده است.</div>
+        </div>
+      </div>
+
+      <div class="card up u-mb16" >
+        <div class="hd"><div class="tile t-blue"><svg class="i"><use href="#i-id"/></svg></div><div><h3>۵. به‌روزرسانی اطلاعات پرسنل</h3><small>یک یا چند فایل اکسل (کارگزینی، بیمه، حساب/شبا) را با هم بدهید — فقط افراد موجود و فقط فیلدهای غیرخالی که فرق دارند به‌روز می‌شوند</small></div></div>
+        <input type="file" id="updFiles" accept=".xlsx,.xlsm,.xls,.csv" multiple hidden>
+        <div class="drop" id="dropUpd"><b>فایل‌ها را رها کنید</b>یا برای انتخاب (چند فایل با هم) کلیک کنید</div>
+        <label class="c" style="display:flex;gap:6px;align-items:center;margin-top:8px"><input type="checkbox" id="updCreate" checked> افراد ناموجود در سیستم هم اضافه شوند (ستون «وضعیت»: فعال ← شاغل، غیرفعال ← قطع رابطه)</label>
+        <a href="#" class="sample" data-sample="update">⬇ دانلود فایل نمونه (Excel)</a>
+        <div class="filemeta" id="updMeta">فایلی وارد نشده است. شمارهٔ شبا اعتبارسنجی می‌شود و ۱۳ رقم آخرش با شمارهٔ حساب ذخیره‌شده مقایسه و در صورت تفاوت اصلاح می‌شود.</div>
+      </div>
+
+      <div class="console" id="liveLog"><div class="cap"><span>وضعیت و کنسول پردازش</span><small>LIVE LOGS</small></div><div class="logEmpty">[آماده] منتظر انتخاب فایل برای شروع پردازش…</div></div>
+    </section>
+
+    <!-- ===== پرسنل ===== -->
+    <section class="page" id="page-personnel">
+      <div class="pf-layout">
+        <aside class="card pf-side">
+          <input class="inp" id="personnelSearch" type="search" placeholder="جست‌وجوی کد پرسنلی، نام یا کد ملی">
+          <select class="inp" id="personnelBy" title="جست‌وجو بر اساس"><option value="">جست‌وجو در: کد پرسنلی، نام، کد ملی</option><option value="account">شمارهٔ حساب / شبا</option><option value="mobile">تلفن همراه</option><option value="workplace">محل خدمت</option><option value="all">همهٔ این فیلدها</option></select>
+          <div class="hint" style="font-size:11.5px">میانبرها: <span class="kbd">F2</span> جست‌وجو · <span class="kbd">F3</span> فیش · <span class="kbd">F6</span> مساعده · <span class="kbd">F7</span> کالا · <span class="kbd">F8</span> وام · <span class="kbd">F9</span> خدمات</div>
+          <div class="chips" id="pfChips">
+            <button data-st="" class="on">همه</button><button data-st="شاغل">شاغل</button><button data-st="بازنشسته">بازنشسته</button><button data-st="وظیفه بگیر">وظیفه بگیر</button><button data-st="قطع رابطه">قطع رابطه</button>
+          </div>
+          <div id="personnelList" class="plist"></div>
+          <div class="prow" style="margin-top:10px">
+            <button class="btn" id="personnelPrev">قبلی</button>
+            <span id="personnelPageInfo" style="flex:1;text-align:center;color:var(--muted);font-size:12px"></span>
+            <button class="btn" id="personnelNext">بعدی</button>
+          </div>
+          <button class="btn" id="btnPersonnelXlsx" style="width:100%;margin-top:8px"><svg class="i"><use href="#i-file"/></svg>خروجی اکسل (طبق جست‌وجو و فیلتر)</button>
+        </aside>
+        <div class="pf-main" id="pfMain"><div class="empty">یک نفر را از فهرست انتخاب کنید تا فرم پرسنلی کامل او نمایش داده شود.</div></div>
+      </div>
+    </section>
+
+    <!-- ===== فیش ===== -->
+    <section class="page" id="page-slips">
+      <div class="toolbar">
+        <label class="f u-row8" >سال<select id="slipYear" class="inp" style="width:110px"></select></label>
+        <label class="f u-row8" >ماه<select id="slipMonth" class="inp" style="width:140px"></select></label>
+        <input class="inp" id="search" type="search" placeholder="جست‌وجوی نام یا کد پرسنلی در دورهٔ فعال">
+        <button class="btn btn-main" id="btnPrint" disabled><svg class="i"><use href="#i-print"/></svg>چاپ این فیش</button>
+        <button class="btn" id="btnPrintRange" disabled title="همهٔ فیش‌های فردِ انتخاب‌شده بین دو دورهٔ حقوقی">چاپ فیش‌های این فرد بین دو دوره</button>
+        <select id="printKind" class="inp" style="width:150px" title="نوع فیش‌ها برای «چاپ همهٔ فیش‌های دوره»"><option value="all">شاغلین و بازنشستگان</option><option value="active">فقط شاغلین</option><option value="retiree">فقط بازنشستگان</option></select>
+        <button class="btn" id="btnPrintAll" disabled>چاپ همهٔ فیش‌های دوره</button>
+      </div>
+      <div class="slips">
+        <div class="stack">
+          <div class="card" id="peoplePanel"><h2><svg class="i"><use href="#i-users"/></svg>افراد این دوره</h2><select id="empList" size="12"></select></div>
+          <div class="card" id="sumPanel"><h2><svg class="i"><use href="#i-list"/></svg>جمع‌بندی این فرد</h2>
+            <div class="sum"><span>جمع مزایا</span><b id="sGross">۰</b></div>
+            <div class="sum"><span>جمع کسور</span><b id="sDed">۰</b></div>
+            <div class="sum"><span>تعهدات کارفرما</span><b id="sEmp">۰</b></div>
+            <div class="sum total"><span>خالص پرداختی</span><b id="sNet">۰</b></div>
+          </div>
+        </div>
+        <div class="sheet-wrap"><div id="preview"><div class="empty">ابتدا به سرور وصل شوید.</div></div></div>
+      </div>
+    </section>
+
+    <!-- ===== نوبت وام ===== -->
+    <section class="page" id="page-loans">
+      <div class="subtabs" id="lqTabs" style="display:flex;gap:6px;margin:0 0 12px;flex-wrap:wrap">
+        <button class="btn btn-blue" data-lqtab="a" type="button">نمودار نوبت و گزارش سررسید</button>
+        <button class="btn" data-lqtab="b" type="button">گزارش نوبت و دریافت‌کنندگان</button>
+        <button class="btn" data-lqtab="c" type="button">انتقال نوبت‌ها (خروجی / ورودی)</button>
+        <button class="btn" data-lqtab="d" type="button">ثبت دریافت وام از اکسل</button>
+      </div>
+      <div data-lqpane="a">
+        <div class="toolbar">
+          <label class="f u-row8" >سال<input id="lqYear" type="number" min="1390" max="1450" class="inp" style="width:110px"></label>
+          <label class="f u-row8" >ماه<select id="lqMonth" class="inp" style="width:140px"></select></label>
+          <button class="btn btn-amber" id="btnLqReport"><svg class="i"><use href="#i-search"/></svg>نمایش گزارش سررسید</button>
+          <button class="btn btn-blue" id="btnLqXlsx" type="button">خروجی اکسل نوبت‌ها</button>
+          <label class="f u-row6" ><input type="checkbox" id="lqShowOver"> نمایش عقب‌افتاده‌ها</label>
+        </div>
+        <div class="card u-mb16" ><h2><svg class="i"><use href="#i-chart"/></svg>نوبت وام در ۱۲ ماهِ آینده (از ماه انتخاب‌شده)</h2>
+          <div class="wk-sum u-m0b10" id="lqChartSum" ></div><div class="chart-box" id="lqChart"><div class="chart-empty">در حال بارگذاری…</div></div></div>
+        <div class="card"><h2><svg class="i"><use href="#i-coins"/></svg>گزارش سررسید و افراد واجد شرایط دریافت وام</h2><div id="lqReportBody"></div></div>
+      </div>
+      <div data-lqpane="b" hidden>
+        <div class="card u-mb16" ><h2><svg class="i"><use href="#i-chart"/></svg>وام‌های پرداخت‌شده در یک سال گذشته</h2>
+          <div class="wk-sum u-m0b10" id="lqPaidSum" ></div><div class="chart-box" id="lqPaidChart"><div class="chart-empty">در حال بارگذاری…</div></div></div>
+        <div class="card"><h2><svg class="i"><use href="#i-list"/></svg>گزارش افراد در نوبت و دریافت‌کنندگان وام</h2>
+          <div class="toolbar" style="margin-bottom:10px;flex-wrap:wrap">
+            <label class="f u-row8" >وضعیت<select id="lqListSt" class="inp u-w170" ><option value="all">همه (نوبت + دریافت‌شده)</option><option value="pending">فقط در نوبت</option><option value="received">فقط دریافت‌کنندگان</option></select></label>
+            <label class="f u-row8" >فیلتر بر اساس<select id="lqListDt" class="inp u-w170" ><option value="req">تاریخ درخواست</option><option value="due">تاریخ نوبت</option><option value="recv">تاریخ دریافت وام</option></select></label>
+            <label class="f u-row6" >از سال<input id="lqFromY" type="number" min="1390" max="1450" class="inp" style="width:90px"></label>
+            <label class="f u-row6" >ماه<select id="lqFromM" class="inp" style="width:120px"></select></label>
+            <label class="f u-row6" >تا سال<input id="lqToY" type="number" min="1390" max="1450" class="inp" style="width:90px"></label>
+            <label class="f u-row6" >ماه<select id="lqToM" class="inp" style="width:120px"></select></label>
+            <button class="btn btn-amber" id="btnLqList" type="button">نمایش گزارش</button>
+            <button class="btn" id="btnLqListClear" type="button">حذف فیلتر تاریخ</button>
+            <button class="btn btn-blue" id="btnLqListXlsx" type="button">خروجی اکسل</button>
+          </div>
+          <div id="lqListBody"></div></div>
+      </div>
+      <div data-lqpane="c" hidden>
+        <div class="card u-mb16" ><h2><svg class="i"><use href="#i-coins"/></svg>خروجی نوبت‌های وام (برای انتقال به سیستم دیگر)</h2>
+          <div class="hint u-mb8" >همهٔ نوبت‌ها با وضعیت، مبلغ‌ها، تاریخ دریافت و پایان اقساط و مشخصات ضامن در یک فایل اکسل ذخیره می‌شود. ردیف‌ها با «کد پرسنلی + سال و ماه ثبت نوبت» شناسایی می‌شوند.</div>
+          <div class="toolbar">
+            <label class="f u-row8" >وضعیت<select id="lqxSt" class="inp u-w170" ><option value="all">همهٔ نوبت‌ها</option><option value="pending">فقط در انتظار</option><option value="received">فقط دریافت‌شده</option><option value="cancelled">فقط لغوشده</option></select></label>
+            <button class="btn btn-blue" id="btnLqxExport" type="button">خروجی اکسل نوبت‌ها برای انتقال</button>
+          </div><div id="lqxExpMsg" class="hint"></div></div>
+        <div class="card"><h2><svg class="i"><use href="#i-coins"/></svg>ورود نوبت‌های وام از فایل اکسل</h2>
+          <div class="hint u-mb8" >فایلی را که از همین بخش در سیستم دیگر خروجی گرفته‌اید انتخاب کنید. ابتدا «بررسی» را بزنید تا بدون ثبت، نتیجه را ببینید. افرادی که کد پرسنلی‌شان در این سیستم نیست رد می‌شوند.</div>
+          <div class="toolbar">
+            <input type="file" id="lqxFile" accept=".xlsx,.xls" class="inp" style="max-width:280px">
+            <label class="f u-row8" >روش<select id="lqxMode" class="inp" style="width:290px"><option value="add">فقط افزودن نوبت‌های جدید (موجودها دست نمی‌خورد)</option><option value="update">افزودن جدیدها و به‌روزرسانی موجودها</option><option value="replace">جایگزینی کامل (همهٔ نوبت‌های فعلی حذف می‌شود)</option></select></label>
+            <button class="btn btn-amber" id="btnLqxCheck" type="button">بررسی (بدون ثبت)</button>
+            <button class="btn btn-main" id="btnLqxRun" type="button">ورود نوبت‌ها</button>
+          </div><div id="lqxImpMsg"></div></div>
+      </div>
+      <div data-lqpane="d" hidden>
+        <div class="card"><h2><svg class="i"><use href="#i-coins"/></svg>ثبت دریافت وام از فایل اکسل (افرادی که وامشان پرداخت شده)</h2>
+          <div class="hint u-mb8" >فایل اکسل با ستون‌های <b>کد پرسنلی، مبلغ وام، مبلغ قسط، تاریخ دریافت</b> (تاریخ شمسی مثل 1405/07/21) انتخاب کنید. برای هر ردیف، نوبتِ «در انتظار» همان فرد به «دریافت شده» تغییر می‌کند: مبلغ وام و قسط و تاریخ دریافت از فایل ثبت می‌شود، تعداد اقساط = وام ÷ قسط (رو به بالا) و پایان اقساط از تاریخ دریافت حساب می‌شود. ردیف‌هایی که نوبت «در انتظار» ندارند (قبلاً دریافت‌شده، لغو شده، بدون نوبت)، تکراری یا نامعتبرند رد و دلیلشان نمایش داده می‌شود. ابتدا «بررسی» را بزنید.</div>
+          <div class="toolbar">
+            <input type="file" id="lqrFile" accept=".xlsx,.xls" class="inp" style="max-width:280px">
+            <button class="btn btn-amber" id="btnLqrCheck" type="button">بررسی (بدون ثبت)</button>
+            <button class="btn btn-main" id="btnLqrRun" type="button">ثبت دریافت وام</button>
+            <button class="btn" id="btnLqrSample" type="button">فایل نمونه</button>
+          </div><div id="lqrMsg"></div></div>
+      </div>
+    </section>
+
+    <!-- ===== وام (ثبت و چاپ فرم) ===== -->
+    <section class="page" id="page-loanform"><div id="wk-loanform"></div></section>
+    <section class="page" id="page-vefagh"><div id="wk-vefagh"></div></section>
+
+    <!-- ===== مساعده (وام کوتاه‌مدت) ===== -->
+    <section class="page" id="page-advance"><div id="wk-advance"></div></section>
+
+    <!-- ===== درخواست کالا (فروش اقساطی) ===== -->
+    <section class="page" id="page-life"><div id="wk-life"></div></section>
+    <section class="page" id="page-insurance"><div id="wk-insurance"></div></section>
+    <section class="page" id="page-dcodes"><div id="wk-dcodes"></div></section>
+    <section class="page" id="page-statushistory"><div id="wk-statushistory"></div></section>
+    <section class="page" id="page-deceased"><div id="wk-deceased"></div></section>
+    <div id="lyDlg" hidden style="position:fixed;inset:0;z-index:900;background:#e2e8f0;flex-direction:column">
+      <div style="padding:8px 14px;background:#fff;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center"><b id="lyTitle"></b><span style="flex:1"></span>
+        <label class="u-fs12" >نمای صفحه <input type="range" min="50" max="160" value="100" data-lyz style="vertical-align:middle;width:110px"></label>
+        <label class="u-fs12" ><input type="checkbox" data-lyguides> نمایش مرز بخش‌ها</label>
+        <label class="u-fs12" >شبکهٔ چسبندگی <select data-lysnap><option value="0">بدون</option><option value="1">۱ میلی‌متر</option><option value="2">۲ میلی‌متر</option><option value="5">۵ میلی‌متر</option></select></label><label class="u-fs12" ><input type="checkbox" data-lygrid> خطوط شبکه</label>
+        <button class="btn" data-ly="addtext">➕ متن</button><button class="btn" data-ly="addbox">▭ کادر</button><button class="btn" data-ly="addimg">🖼 تصویر</button><input type="file" id="lyImgFile" accept="image/png,image/jpeg" hidden><button class="btn" data-ly="addline">➖ خط</button><button class="btn" data-ly="addspace">↕ فاصله</button><button class="btn" data-ly="undo">↶ بازگشت</button><button class="btn" data-ly="redo">↷ تکرار</button><label class="u-fs12" ><input type="checkbox" data-lyruler> خط‌کش</label>
+        <button class="btn btn-main" data-ly="save">ذخیرهٔ چیدمان و متن‌ها</button><button class="btn" data-ly="reset">پیش‌فرض</button><button class="btn" data-ly="close">بستن</button></div>
+      <div style="flex:1;display:flex;min-height:0">
+        <div id="lyTools"></div>
+        <div id="lyCanvas" style="flex:1;overflow:auto;padding:16px;position:relative"><div id="lyDoc" style="margin:0 auto;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.18);padding:6mm"></div>
+          <div id="lyHdl" hidden><i data-h="nw"></i><i data-h="n"></i><i data-h="ne"></i><i data-h="w"></i><i data-h="e"></i><i data-h="sw"></i><i data-h="s"></i><i data-h="se"></i></div></div>
+      </div>
+    </div>
+    <div class="modalWrap" id="pwDlg" hidden>
+      <div class="modalBox"><p id="pwDlgT" style="margin-bottom:8px;font-weight:700">برای تأیید نهایی، رمز عبور مدیر را وارد کنید</p>
+        <input type="password" id="pwInput" aria-labelledby="pwDlgT" autocomplete="current-password" style="width:100%;margin-bottom:12px">
+        <div class="row-end"><button type="button" class="btn btn-quiet" id="pwNo">انصراف</button><button type="button" class="btn btn-del" id="pwYes">تأیید و پاک‌سازی</button></div></div>
+    </div>
+    <section class="page" id="page-schools"><div id="wk-schools"></div></section>
+    <section class="page" id="page-emdad"><div id="wk-emdad"></div></section>
+    <section class="page" id="page-mehr"><div id="wk-mehr"></div></section>
+    <section class="page" id="page-cheque"><div id="wk-cheque"></div></section>
+    <section class="page" id="page-banks">
+        <div class="card" id="bankCard">
+          <h2><svg class="i"><use href="#i-wallet"/></svg>تعریف بانک و شعبه</h2>
+          <p class="sub">بانک‌ها و شعبه‌ها در «صدور دسته چک» انتخاب می‌شوند. می‌توانید دستی اضافه/ویرایش کنید یا فایل اکسل دارای شیت «بانک» (کد بانک، نام بانک) و شیت «شعب» (کد بانک، کد شعبه، نام شعبه) را وارد کنید؛ موارد هم‌کد به‌روز می‌شوند.</p>
+          <div class="grid">
+            <div><div class="wk-acts u-mb6" ><input id="bn-code" class="ltr" placeholder="کد بانک" style="max-width:90px"><input id="bn-name" placeholder="نام بانک" style="flex:1;min-width:140px"><button class="btn btn-main" id="btnBnAdd">افزودن بانک</button></div>
+              <div class="tbl-wrap" style="max-height:340px;overflow:auto"><table class="tbl"><thead><tr><th>کد</th><th>نام بانک</th><th>شعب</th><th></th></tr></thead><tbody id="bnBody"></tbody></table></div>
+              <div class="wk-acts u-mt8" ><input type="file" id="bnFile" accept=".xlsx,.xls"><span class="hint">ورود از اکسل (شیت‌های «بانک» و «شعب»)</span></div></div>
+            <div><div id="brHead" class="hint u-mb6" >برای دیدن و تعریف شعبه‌ها، یک بانک را از فهرست انتخاب کنید.</div>
+              <div id="brTools" hidden><div class="wk-acts u-mb6" ><input id="br-code" class="ltr" placeholder="کد شعبه" style="max-width:90px"><input id="br-name" placeholder="نام شعبه" style="flex:1;min-width:140px"><button class="btn btn-main" id="btnBrAdd">افزودن شعبه</button></div>
+                <input id="br-q" placeholder="جست‌وجوی شعبه (نام یا کد)" style="width:100%;margin-bottom:6px">
+                <div class="tbl-wrap" style="max-height:340px;overflow:auto"><table class="tbl"><thead><tr><th>کد شعبه</th><th>نام شعبه</th><th></th></tr></thead><tbody id="brBody"></tbody></table></div></div></div>
+          </div>
+        </div>
+    </section>
+    <section class="page" id="page-changes"><div id="wk-changes"></div></section>
+    <section class="page" id="page-goods"><div id="wk-goods"></div></section>
+    <section class="page" id="page-services"><div id="wk-services"></div></section>
+    <section class="page" id="page-institutions"><div id="wk-institutions"></div></section>
+
+    <!-- ===== انبارداری ===== -->
+    <section class="page" id="page-inventory"><div id="wk-inventory"></div></section>
+
+    <!-- ===== گزارش‌های مالی ===== -->
+    <section class="page" id="page-reports"><div id="wk-reports"></div></section>
+    <section class="page" id="page-closing"><div id="wk-closing"></div></section>
+
+    <!-- ===== مدیریت کاربران ===== -->
+    <section class="page" id="page-users"><div id="wk-users"></div></section>
+
+    <!-- ===== اتصال و تنظیمات ===== -->
+    <section class="page" id="page-settings">
+      <div class="chips u-mb14" id="setTabs" ><button data-stab="conn" class="on">اتصال و پشتیبان‌گیری</button><button data-stab="slip">فیش حقوقی</button><button data-stab="loan">وام، مساعده و گرد کردن</button><button data-stab="forms">فرم‌های چاپی</button><button data-stab="codes">تعریف کدهای مهم</button><button data-stab="ins">بیمه تکمیلی</button><button data-stab="pages">ظاهر صفحه‌ها</button><button data-stab="look">ظاهر برنامه (رنگ و اندازه)</button><button data-stab="keys">کلیدهای میانبر</button><button data-stab="init">راه‌اندازی اولیه</button></div>
+      <div class="g2" id="setGrid">
+        <div class="card" id="keysCard" data-sg="keys" style="grid-column:1/-1"><h2><svg class="i"><use href="#i-gear"/></svg>کلیدهای میانبر</h2><div id="keysBody"></div></div>
+        <div class="card" id="setConn" data-sg="conn">
+          <h2><svg class="i"><use href="#i-plug"/></svg>اتصال به سرور</h2>
+          <p class="sub">آدرس سرور و کلید دسترسی را از مدیر سیستم بگیرید.</p>
+          <div class="stack" style="gap:12px">
+            <label class="f">آدرس سرور<input id="apiBase" type="text" placeholder="https://payroll.example.com"></label>
+            <label class="f">کلید دسترسی<input id="apiKeyInput" type="password" autocomplete="off"></label>
+            <label class="c"><input type="checkbox" id="apiKeyRemember"> به‌خاطر سپردن کلید در این مرورگر (فقط روی رایانهٔ شخصی و امن)</label>
+            <p class="hint" style="margin:-4px 0 0">بدون این گزینه، کلید فقط تا بسته شدن همین زبانهٔ مرورگر نگه داشته می‌شود.</p>
+            <button class="btn btn-main" id="btnConnect">اتصال</button>
+            <div class="filemeta" id="connStatus"></div>
+            <button class="btn" id="btnPhotoCheck" type="button">بررسی پوشهٔ عکس‌های پرسنل</button>
+            <div class="filemeta" id="photoStatus"></div>
+          </div>
+        </div>
+        <div class="card" id="setSlip" data-sg="slip">
+          <h2><svg class="i"><use href="#i-gear"/></svg>سربرگ فیش و تنظیمات</h2>
+          <div class="grid">
+            <label class="f">ماه این دوره<select id="perMonth"></select></label>
+            <label class="f">سال این دوره<input id="perYear" type="number" min="1390" max="1450"></label>
+            <label class="f">واحد پول<select id="unit"><option value="ریال">ریال</option><option value="تومان">تومان</option></select></label>
+            <label class="f">تاریخ صدور<input id="issueDate" type="text"></label>
+          </div>
+          <label class="c"><input type="checkbox" id="optEmployer" checked> نمایش سهم کارفرما روی فیش</label>
+          <label class="c"><input type="checkbox" id="optZero"> نمایش اقلام با مبلغ صفر</label>
+          <label class="c"><input type="checkbox" id="optShowCodes" checked> نمایش «کد کسر و ردیف» مثل (۷۳۳-۷) کنار شرح اقلام فیش</label>
+          <label class="f">تعداد فیش‌های نمایش‌داده‌شده در صفحهٔ پرسنل (سابقهٔ فیش‌ها)<input id="optRecentSlips" type="number" min="1" max="120" style="max-width:120px"></label>
+          <label class="c"><input type="checkbox" id="optMetaLine" checked> نمایش خط «تاریخ صدور / مبالغ به … / کارکرد» زیر سربرگ فیش</label>
+        </div>
+        <div class="card" id="setForms" data-sg="forms">
+          <h2><svg class="i"><use href="#i-file"/></svg>سربرگ، مدیر و حاشیهٔ فرم‌های چاپی</h2>
+          <p class="sub">نام اداره، نام صندوق، مدیر (امضا) و حاشیهٔ چاپ — روی سرور ذخیره می‌شود و برای همهٔ کاربران یکی است.</p>
+          <div class="grid">
+            <label class="f">نام اداره (سربرگ فرم‌ها)<input id="fs-orgName" type="text"></label>
+            <label class="f">نام صندوق<input id="fs-fundName" type="text"></label>
+            <label class="f">عنوان مدیر (امضا)<input id="fs-managerTitle" type="text"></label>
+            <label class="f">نام مدیر<input id="fs-managerName" type="text"></label>
+
+            <label class="f">حاشیهٔ راست (میلی‌متر)<input id="fs-formMarginRight" type="text" class="ltr"></label>
+            <label class="f">حاشیهٔ چپ (میلی‌متر)<input id="fs-formMarginLeft" type="text" class="ltr"></label>
+          </div>
+          <div class="u-mt12" ><button class="btn btn-main" id="btnSaveFs">ذخیرهٔ تنظیمات فرم‌ها</button></div>
+        </div>
+        <div class="card" id="backupCard" data-sg="conn" hidden>
+          <h2><svg class="i"><use href="#i-file"/></svg>پشتیبان‌گیری و بازیابی داده‌ها</h2>
+          <p class="sub">پشتیبان کل دیتابیس (پرسنل، فیش‌ها، وام، مساعده، کالا، کاربران و تنظیمات) در پوشهٔ <b>backups</b> کنار سرور ذخیره می‌شود و می‌توانید آن را دانلود کنید. پشتیبان خودکار هم طبق برنامه گرفته می‌شود. عکس‌های پرسنل (پوشهٔ <b>pic</b>) داخل پشتیبان نیست؛ آن پوشه را جداگانه کپی کنید. فایل پشتیبان را هم روی دیسک یا سیستم دیگری نگه دارید.</p>
+          <div id="bkInfo" class="hint u-m0b10" ></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+            <button class="btn btn-main" id="bkCreate">ساخت پشتیبان جدید</button>
+            <label class="btn" style="cursor:pointer">بارگذاری فایل پشتیبان<input type="file" id="bkFile" accept=".gz,.ndjson.gz" hidden></label>
+            <span id="bkMsg" class="hint"></span>
+          </div>
+          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>فایل</th><th>نوع</th><th>حجم</th><th>زمان</th><th></th></tr></thead><tbody id="bkRows"><tr><td colspan="5" class="hint">در حال بارگیری...</td></tr></tbody></table></div>
+        </div>
+        <div class="card" id="initCard" data-sg="init" hidden>
+          <h2 style="color:#b91c1c">راه‌اندازی اولیه — پاک‌سازی کامل اطلاعات</h2>
+          <p class="sub">برای نصب جدید: <b>همهٔ اطلاعات</b> (دوره‌ها و فیش‌ها، پرسنل، وام و نوبت، مساعده، امداد، انبار و کالا، موسسات، مدارس، درگذشتگان، بیمه عمر، تغییرات ماهانه، تاریخچه‌ها و …) پاک می‌شود. حساب کاربران و رمزها می‌مانند. پیش از پاک‌سازی یک پشتیبان خودکار (<code>pre-reset</code>) ساخته می‌شود و اگر ساخته نشود هیچ‌چیز پاک نمی‌شود. عکس‌های پرسنل (پوشهٔ <code>pic</code>) پاک نمی‌شود. فقط مدیر؛ با دو هشدار و وارد کردن دوبارهٔ رمز عبور.</p>
+          <label style="display:flex;gap:6px;align-items:center;margin:8px 0"><input type="checkbox" id="initSettings"> تنظیمات (سربرگ، قالب و طرح فرم‌ها، پارامترها) هم پاک شود</label>
+          <button class="btn btn-del" id="btnInit">شروع راه‌اندازی اولیه…</button>
+        </div>
+        <div class="card" id="lookCard" data-sg="look">
+          <h2><svg class="i"><use href="#i-gear"/></svg>ظاهر برنامه</h2>
+          <p class="sub">رنگ اصلی، رنگ منوی کناری، اندازهٔ نوشته، فشردگی، گردی گوشه‌ها و حالت تیره. تغییرات همان لحظه اعمال و روی همین مرورگر ذخیره می‌شود (روی چاپ و فرم‌ها اثری ندارد).</p>
+          <div id="lookBody"></div>
+        </div>
+        <div class="card" id="plCard" data-sg="pages">
+          <h2><svg class="i"><use href="#i-list"/></svg>ظاهر صفحه‌ها — فرم پرسنلی</h2>
+          <p class="sub">ترتیب و نمایش بخش‌ها (مثلاً «وضعیت مالی» را بالای «اطلاعات استخدامی» بگذارید)، ترتیب و نمایش هر فیلد، عرض دو ستونی، انتقال فیلد به بخش دیگر و افزودن فیلد دلخواه. برای همهٔ کاربران اعمال می‌شود.</p>
+          <div id="plBody"></div>
+        </div>
+        <div class="card" id="sgCard" data-sg="forms">
+          <h2><svg class="i"><use href="#i-print"/></svg>امضاکنندگان فرم‌های چاپی</h2>
+          <p class="sub">سمت و نام کسانی که می‌توانند زیر فرم‌ها امضا کنند. هر امضا را در «طراح فرم‌ها» برای هر فرم اضافه یا حذف کنید.</p>
+          <div id="sgBody"></div>
+          <div class="wk-acts u-mt8" ><button class="btn" data-dz="sgadd">+ امضاکنندهٔ جدید</button><button class="btn btn-main" data-dz="sgsave">ذخیرهٔ امضاکنندگان</button></div>
+        </div>
+        <div class="card" id="dzCard" data-sg="forms">
+          <h2><svg class="i"><use href="#i-print"/></svg>طراح فرم‌های چاپی</h2>
+          <p class="sub">برای هر فرم: امضاها، فیلدهای اضافه (مثل کد ملی)، سطرهای اضافه و چیدمان آزاد.</p>
+          <label class="f" style="max-width:420px">فرم<select id="dzForm"></select></label><div id="dzBody"></div>
+        </div>
+        <div class="card" id="tplCard" data-sg="forms">
+          <h2><svg class="i"><use href="#i-print"/></svg>قالب متن فرم‌های چاپی</h2>
+          <p class="sub">متن هر فرم را یک بار ویرایش کنید تا برای همهٔ فرم‌های همان نوع اعمال شود. در پیش‌نمایش باز‌شده روی متن کلیک و تغییر دهید، سپس «ذخیره متن به‌عنوان قالب» را بزنید. مقدارهای هر فرد (نام، کد، مبلغ و ...) به‌صورت پررنگ و خودکار جایگزین می‌شوند؛ آن‌ها را پاک نکنید مگر نخواهید در متن بیایند. همین پیش‌نمایش هنگام چاپ برای هر فرد هم هست؛ ویرایش آنجا بدون ذخیرهٔ قالب فقط برای همان چاپ است.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn" data-tpl="goods">فرم درخواست کالا</button>
+            <button class="btn" data-tpl="advance">فرم مساعده</button>
+            <button class="btn" data-tpl="receipt">فرم دریافت وام</button>
+            <button class="btn" data-tpl="notice">اطلاعیهٔ نوبت وام</button>
+            <button class="btn" data-tpl="service">نامهٔ خدمات (موسسات)</button>
+            <button class="btn" data-tpl="emdad">فرم وام امداد</button>
+            <button class="btn" data-tpl="lifeA">فرم بیمه عمر مصوب</button>
+            <button class="btn" data-tpl="lifeB">فرم بیمه عمر مکمل</button>
+            <button class="btn" data-tpl="lifeClaim">فرم پرداخت غرامت بیمه عمر</button>
+            <button class="btn" data-tpl="deceased">فرم پروندهٔ درگذشته</button>
+            <button class="btn" data-tpl="sigchange">نامهٔ تغییر امضاء آموزشگاه</button>
+            <button class="btn" data-tpl="cancel">فرم انصراف و تسویه حساب (لغو عضویت)</button>
+            <button class="btn" data-tpl="capital">فرم افزایش سرمایه / تسویه وام</button>
+            <button class="btn" data-tpl="vcapital">فرم وام وفاق (عضویت / افزایش سرمایه / تسویه وام)</button>
+            <button class="btn" data-tpl="vcancel">فرم انصراف و تسویه حساب (وام وفاق)</button>
+            <button class="btn" data-tpl="mehr">فرم وام بانک مهر</button>
+            <button class="btn" data-tpl="cheque">نامهٔ دریافت دسته چک</button>
+            <button class="btn" data-tpl="insDeps">لیست افراد تحت تکفل (بیمه تکمیلی)</button>
+          </div>
+        </div>
+        <div class="card" id="setFin" data-sg="loan">
+          <h2><svg class="i"><use href="#i-coins"/></svg>مساعده، امداد، بیمه عمر و شماره‌گذاری</h2>
+          <p class="sub">درصدها، روز واریز و شمارهٔ شروع نامه‌ها (روی سرور ذخیره می‌شود).</p>
+          <div class="grid">
+            <label class="f">درصد کسر مساعده<input id="fs-advanceFeePercent" type="text"></label>
+            <label class="f">روز واریز مساعده در ماه<input id="fs-advancePayDay" type="text"></label>
+            <label class="f">مبلغ پیش‌فرض مساعده (ریال)<input id="fs-advanceDefaultAmount" type="text" class="ltr" inputmode="numeric" data-money></label>
+            <label class="f">تعداد اقساط پیش‌فرض مساعده<input id="fs-advanceDefaultInstallments" type="text" class="ltr"></label>
+            <label class="f">شمارهٔ شروع بیمه عمر<input id="fs-lifeNumberStart" type="text" class="ltr"></label>
+            <label class="f">درصد کارمزد وام امداد<input id="fs-emdadFeePercent" type="text" class="ltr"></label>
+            <label class="f">مبلغ پیش‌فرض وام امداد (ریال)<input id="fs-emdadDefaultAmount" type="text" class="ltr" inputmode="numeric" data-money></label>
+            <label class="f">تعداد اقساط پیش‌فرض وام امداد<input id="fs-emdadDefaultInstallments" type="text" class="ltr"></label>
+            <label class="f">تعداد اقساط پیش‌فرض درخواست کالا<input id="fs-goodsDefaultInstallments" type="text" class="ltr"></label>
+            <label class="f">شمارهٔ شروع نامه‌های خدمات<input id="fs-serviceLetterStart" type="text" class="ltr"></label>
+          </div>
+          <div class="u-mt12" ><button class="btn btn-main" id="btnSaveFs2">ذخیرهٔ این تنظیمات</button></div>
+        </div>
+        <div class="card" id="lpCard" data-sg="loan">
+          <h2><svg class="i"><use href="#i-coins"/></svg>پارامترهای فرمول وام</h2>
+          <p class="sub">وام = (سرمایهٔ اولیه + مدت انتظار × سهم صندوق) × ۳، رند به بالا طبق «گرد کردن مبالغ» و در صورت بیشتر شدن از حداکثر، برابر حداکثر (۰ = بدون سقف). «مدت انتظار» ماهِ نوبت را هم تعیین می‌کند: ماه نوبت = ماه اتمام قسط (یا تاریخ درخواست) + مدت انتظار.</p>
+          <div class="grid">
+            <label class="f">مدت انتظار (به ماه)<input id="lp-wait" type="number" min="0"></label>
+            <label class="f">میزان سهم صندوق (ریال)<input id="lp-share" class="ltr" inputmode="numeric" data-money></label>
+            <label class="f">حداکثر میزان وام (ریال)<input id="lp-max" class="ltr" inputmode="numeric" data-money></label>
+          </div>
+          <div class="u-mt12" ><button class="btn btn-main" id="btnSaveLp">ذخیرهٔ پارامترها</button> <button class="btn" id="btnApplyLp" title="مبلغ وام، قسط و ماه نوبت همهٔ نوبت‌های در انتظار را با پارامترهای فعلی دوباره حساب می‌کند">اعمال روی نوبت‌های در انتظار</button></div>
+        </div>
+        <div class="card" id="insCard" data-sg="ins">
+          <h2><svg class="i"><use href="#i-file"/></svg>بیمهٔ تکمیلی درمان</h2>
+          <p class="sub">مبلغ سهم دولت و سهم کارمند به‌ازای هر نفر (ریال). در صفحهٔ «بیمه تکمیلی» (ستون‌های سهم هر فرد، چاپ) و گزارش تجمیعی و خروجی اکسل از همین مبلغ‌ها استفاده می‌شود. سرپرست، فرزند و همسرِ سرپرست مرد: سهم دولت + سهم کارمند؛ پدر، مادر و همسرِ سرپرست زن: سهم دولت صفر و سهم کارمند = دولت + کارمند.</p>
+          <div class="grid">
+            <label class="f">سهم دولت (هر نفر، ریال)<input id="ins-sgovt" class="ltr" inputmode="numeric" data-money></label>
+            <label class="f">سهم کارمند (هر نفر، ریال)<input id="ins-semp" class="ltr" inputmode="numeric" data-money></label>
+          </div>
+          <div class="u-mt12" ><button class="btn btn-main" id="btnSaveIns">ذخیرهٔ سهم‌ها</button></div>
+        </div>
+        <div class="card" id="sigImgCard" data-sg="forms">
+          <h2><svg class="i"><use href="#i-file"/></svg>امضای مدیر</h2>
+          <p class="sub">تصویر امضا (ترجیحاً PNG با زمینهٔ شفاف) را بارگذاری کنید و مشخص کنید روی کدام فرم‌های چاپی دیده شود. محل و اندازهٔ امضا در هر فرم از «چیدمان آزاد» (بخش «c:d-sigimg») قابل تغییر است.</p>
+          <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><div id="sigPrev" style="width:200px;height:110px;border:1px dashed var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;background:#fff"><span class="hint">امضایی ثبت نشده</span></div>
+            <div class="stack" style="gap:8px"><input type="file" id="sigFile" accept="image/png,image/jpeg"><div class="wk-acts"><button class="btn btn-main" id="btnSigSave" disabled>ذخیرهٔ امضا</button><button class="btn btn-del" id="btnSigDel">حذف امضا</button></div></div></div>
+          <div style="margin-top:14px"><b>چاپ امضا روی این فرم‌ها:</b><div id="sigForms" style="display:flex;flex-wrap:wrap;gap:4px 16px;margin:8px 0"></div>
+            <div class="wk-acts"><button class="btn btn-main" id="btnSigForms">ذخیرهٔ فرم‌های دارای امضا</button></div></div>
+        </div>
+        <div class="card" id="kcCard" data-sg="codes">
+          <h2><svg class="i"><use href="#i-coins"/></svg>تعریف کدهای مهم</h2>
+          <p class="sub">کدهای کسری که برنامه در محاسبه‌ها و ثبت‌ها استفاده می‌کند (مثل وام ضروری، سرمایهٔ صندوق و مساعده). هر جای برنامه که به این کدها نیاز دارد، مقدار را از همین‌جا می‌خواند؛ پس اگر کدی در فیش حقوقی عوض شد فقط همین‌جا تغییر دهید. کد را دقیقاً مثل «کد کسر» در فیش بنویسید (فقط عدد/حرف انگلیسی).</p>
+          <div class="sub" style="margin:10px 0 4px"><b>کدهای فیش شاغلین</b></div>
+          <div class="grid">
+            <label class="f">کد وام ضروری ۱<input id="kc-loan1" class="ltr" maxlength="20" placeholder="710"></label>
+            <label class="f">کد وام ضروری ۲ (اختیاری)<input id="kc-loan2" class="ltr" maxlength="20" placeholder="خالی = تعریف نشده"></label>
+            <label class="f">کد سرمایهٔ صندوق وام ضروری<input id="kc-capital" class="ltr" maxlength="20" placeholder="796"></label>
+            <label class="f">کد مساعده<input id="kc-advance" class="ltr" maxlength="20" placeholder="733"></label>
+            <label class="f">کد سرمایهٔ وام وفاق (اختیاری)<input id="kc-vcapital" class="ltr" maxlength="20" placeholder="خالی = وام وفاق تعریف نشده"></label>
+            <label class="f">کد وام وفاق (اختیاری)<input id="kc-vloan" class="ltr" maxlength="20" placeholder="خالی = تعریف نشده"></label>
+            <label class="f">کد وام امداد (اختیاری؛ ستون «کد کسر» اکسل گزارش مالی)<input id="kc-emdad" class="ltr" maxlength="20" placeholder="خالی = بدون کد"></label>
+          </div>
+          <div class="sub" style="margin:14px 0 4px"><b>کدهای فیش بازنشستگان</b> — سیستم حقوق بازنشستگان کدهای جدا دارد. هر کدی که اینجا خالی بماند، برای بازنشستگان هم همان کد شاغلین استفاده می‌شود (کدهای مشترک).</div>
+          <div class="grid">
+            <label class="f">کد وام ضروری ۱ — بازنشسته<input id="kc-rloan1" class="ltr" maxlength="20" placeholder="خالی = مثل شاغلین"></label>
+            <label class="f">کد وام ضروری ۲ — بازنشسته<input id="kc-rloan2" class="ltr" maxlength="20" placeholder="خالی = مثل شاغلین"></label>
+            <label class="f">کد سرمایهٔ صندوق وام ضروری — بازنشسته<input id="kc-rcapital" class="ltr" maxlength="20" placeholder="خالی = مثل شاغلین"></label>
+            <label class="f">کد مساعده — بازنشسته<input id="kc-radvance" class="ltr" maxlength="20" placeholder="خالی = مثل شاغلین"></label>
+            <label class="f">کد سرمایهٔ وام وفاق — بازنشسته<input id="kc-rvcapital" class="ltr" maxlength="20" placeholder="خالی = مثل شاغلین"></label>
+            <label class="f">کد وام وفاق — بازنشسته<input id="kc-rvloan" class="ltr" maxlength="20" placeholder="خالی = مثل شاغلین"></label>
+            <label class="f">کد وام امداد — بازنشسته<input id="kc-remdad" class="ltr" maxlength="20" placeholder="خالی = مثل شاغلین"></label>
+          </div>
+          <div class="sub" style="margin:14px 0 4px"><b>کدهای مهم اضافی — شاغلین</b> (هر کد با یک عنوان؛ در «خلاصهٔ کدهای مهم» داشبورد با جمع، مانده و روند نمایش داده می‌شود)</div>
+          <div id="kc-extra"></div>
+          <button class="btn" type="button" id="btnKcAdd">+ افزودن کد شاغلین</button>
+          <div class="sub" style="margin:14px 0 4px"><b>کدهای مهم اضافی — بازنشستگان</b> (اگر اینجا چیزی نباشد، کدهای اضافیِ بالا برای هر دو گروه حساب می‌شوند)</div>
+          <div id="kc-rextra"></div>
+          <button class="btn" type="button" id="btnKcRAdd">+ افزودن کد بازنشستگان</button>
+          <div class="u-mt12" ><button class="btn btn-main" id="btnSaveKc">ذخیرهٔ کدهای مهم</button> <button class="btn" id="btnKcDefault">برگرداندن به پیش‌فرض</button></div>
+        </div>
+        <div class="card" id="roundCard" data-sg="loan">
+          <h2><svg class="i"><use href="#i-coins"/></svg>گرد کردن مبالغ</h2>
+          <p class="sub">همهٔ رندها «به بالا» تا مضرب مقدار واردشده (به ریال) انجام می‌شود؛ مقدار ۱ یعنی بدون رند. روی ثبت‌ها و محاسبه‌های جدید اعمال می‌شود (برای نوبت‌های وامِ در انتظار، دکمهٔ «اعمال روی نوبت‌های در انتظار» در صفحهٔ ثبت وام را بزنید).</p>
+          <div class="grid">
+            <label class="f">مبلغ وام (فرمول)<input id="rd-roundLoan" class="ltr" inputmode="numeric" data-money></label>
+            <label class="f">قسط وام<input id="rd-roundLoanInst" class="ltr" inputmode="numeric" data-money></label>
+            <label class="f">مبلغ مساعده<input id="rd-roundAdvance" class="ltr" inputmode="numeric" data-money></label>
+            <label class="f">قسط مساعده<input id="rd-roundAdvInst" class="ltr" inputmode="numeric" data-money></label>
+            <label class="f">جمع کل درخواست کالا<input id="rd-roundGoods" class="ltr" inputmode="numeric" data-money></label>
+            <label class="f">قسط کالا<input id="rd-roundGoodsInst" class="ltr" inputmode="numeric" data-money></label>
+          </div>
+          <div class="u-mt12" ><button class="btn btn-main" id="btnSaveRound">ذخیرهٔ گرد کردن مبالغ</button> <button class="btn" id="btnRoundDefault">برگرداندن به پیش‌فرض</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modalWrap" id="alertDlg" hidden>
+  <div class="modalBox" role="alertdialog" aria-modal="true" aria-labelledby="alertMsg" tabindex="-1"><p id="alertMsg" class="u-mb14" ></p>
+    <div class="row-end"><button type="button" class="btn btn-main" id="alertOk">باشه</button></div></div>
+</div>
+<div class="modalWrap" id="confirmDlg" hidden>
+  <div class="modalBox" role="alertdialog" aria-modal="true" aria-labelledby="confirmMsg" tabindex="-1"><p id="confirmMsg" class="u-mb14" ></p>
+    <div class="row-end">
+      <button type="button" class="btn btn-del" id="confirmYes">تأیید</button>
+      <button type="button" class="btn btn-quiet" id="confirmNo">انصراف</button>
+    </div></div>
+</div>
+
+<div class="modalWrap" id="loginWrap" hidden style="z-index:2000"><div class="modalBox" style="max-width:380px">
+  <h3 id="loginTitle" style="margin-bottom:4px">ورود به سیستم</h3><p class="hint" style="margin-bottom:12px">نام کاربری و رمز عبور خود را وارد کنید.</p>
+  <label class="f" style="margin-bottom:10px">نام کاربری<input id="loginUser" class="ltr" autocomplete="username"></label>
+  <label class="f" style="margin-bottom:10px">رمز عبور<input id="loginPass" type="password" autocomplete="current-password"></label>
+  <div id="loginConn" hidden style="border:1px dashed var(--line);border-radius:10px;padding:10px;margin-top:4px">
+    <p class="hint" style="margin:0 0 8px">تنظیمات اتصال به سرور (آدرس بعد از اولین ورود موفق ذخیره می‌شود؛ کلید فقط تا بسته شدن زبانه، مگر «به‌خاطر سپردن» را بزنید)</p>
+    <label class="f u-mb8" >آدرس سرور<input id="loginBase" class="ltr" placeholder="http://127.0.0.1:4000" autocomplete="off"></label>
+    <label class="f">کلید دسترسی (API_KEY سرور؛ از مدیر سیستم بگیرید)<input id="loginKey" type="password" class="ltr" autocomplete="off"></label>
+    <label class="c u-mt8" ><input type="checkbox" id="loginKeyRemember"> به‌خاطر سپردن کلید در این مرورگر</label>
+  </div>
+  <div style="margin-top:6px"><a href="#" id="loginConnToggle" class="hint">تنظیمات اتصال (آدرس سرور و کلید دسترسی)</a></div>
+  <div id="loginErr" role="alert" style="color:var(--red-ink);font-size:12.5px;min-height:20px;margin-top:6px"></div>
+  <div class="row-end"><button class="btn btn-main" id="btnLogin" style="width:100%">ورود</button></div></div></div>
+<!-- اسکریپت‌های برنامه (نسخهٔ ۱۱۱): ترتیب مهم است؛ هر فایل فقط یک‌بار. فهرست مرجع: js/manifest.json -->
+<script src="./js/core/boot.js?v=111"></script>
+<script src="./js/core/util.js?v=119"></script>
+<script src="./js/core/dialogs.js?v=120"></script>
+<script src="./js/core/xlsx-loader.js?v=111"></script>
+<script src="./js/payslip/parse.js?v=111"></script>
+<script src="./js/payslip/sheet.js?v=111"></script>
+<script src="./js/core/api.js?v=111"></script>
+<script src="./js/core/state.js?v=111"></script>
+<script src="./js/core/connection.js?v=111"></script>
+<script src="./js/payslip/periods.js?v=120"></script>
+<script src="./js/payslip/import.js?v=111"></script>
+<script src="./js/personnel/personnel.js?v=117"></script>
+<script src="./js/dashboard/dashboard.js?v=120"></script>
+<script src="./js/personnel/profile.js?v=120"></script>
+<script src="./js/loans/loan-queue.js?v=117"></script>
+<script src="./js/ui/appearance.js?v=117"></script>
+<script src="./js/loans/loan-receipts.js?v=117"></script>
+<script src="./js/print/batch.js?v=117"></script>
+<script src="./js/core/workspace.js?v=111"></script>
+<script src="./js/ui/dialog.js?v=117"></script>
+<script src="./js/print/forms.js?v=120"></script>
+<script src="./js/core/person-picker.js?v=117"></script>
+<script src="./js/loans/loans.js?v=117"></script>
+<script src="./js/loans/advances.js?v=120"></script>
+<script src="./js/loans/vefagh.js?v=117"></script>
+<script src="./js/loans/emdad.js?v=120"></script>
+<script src="./js/modules/monthly-changes.js?v=120"></script>
+<script src="./js/settings/admin-tools.js?v=120"></script>
+<script src="./js/print/form-designer.js?v=119"></script>
+<script src="./js/modules/schools.js?v=117"></script>
+<script src="./js/modules/deceased.js?v=119"></script>
+<script src="./js/modules/status-history.js?v=120"></script>
+<script src="./js/modules/insurance.js?v=120"></script>
+<script src="./js/modules/life.js?v=117"></script>
+<script src="./js/inventory/goods.js?v=120"></script>
+<script src="./js/inventory/inventory.js?v=120"></script>
+<script src="./js/auth/permissions.js?v=111"></script>
+<script src="./js/ui/nav.js?v=120"></script>
+<script src="./js/auth/session.js?v=120"></script>
+<script src="./js/auth/users-admin.js?v=120"></script>
+<script src="./js/core/excel.js?v=111"></script>
+<script src="./js/personnel/photos.js?v=111"></script>
+<script src="./js/settings/header.js?v=117"></script>
+<script src="./js/settings/backup.js?v=120"></script>
+<script src="./js/reports/closings.js?v=120"></script>
+<script src="./js/reports/reports.js?v=120"></script>
+<script src="./js/modules/services.js?v=117"></script>
+<script src="./js/loans/mehr.js?v=120"></script>
+<script src="./js/modules/cheques-banks.js?v=120"></script>
+<script src="./js/ui/shortcuts.js?v=117"></script>
+<script src="./js/ui/sidebar.js?v=119"></script>
+</body>
+</html>

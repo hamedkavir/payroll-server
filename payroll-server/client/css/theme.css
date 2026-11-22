@@ -1,0 +1,1009 @@
+/* theme.css — لایه‌های ظاهری صفحه (فقط نمایش روی صفحه؛ پنجره‌های چاپ فقط از <style id="appCss"> داخل HTML استفاده می‌کنند).
+   این فایل از ۱۷ بلوک <style> جدا که پشت سر هم داخل payslip-online.html بودند ساخته شده؛ ترتیب بلوک‌ها عیناً حفظ شده
+   تا آبشار (cascade) CSS هیچ تغییری نکند. بخش [18] پالایش ظاهری نسخهٔ ۱۰۹ و بخش پایانی [19] حالت تیرهٔ نسخهٔ ۱۱۱ است.
+
+   فهرست لایه‌ها (ترتیب = اولویت؛ لایهٔ پایین‌تر برنده است):
+     [01] themeV89 ......... توکن‌های طراحی (--ui-*) و بازتعریف رنگ‌های پایه؛ سایدبار، کارت، جدول، دکمه، فیلد
+     [02] dashV90 .......... داشبورد            [03] authV91 ........ پنجرهٔ ورود و تغییر رمز
+     [04] pagesV118 ........ اجزای مشترک همهٔ صفحه‌ها (زبانه، نوار فرد، فرم، پیام، خلاصه، جدول، ...) با :is(#page-…)
+                             + قاعده‌های ویژهٔ هر صفحه. نسخهٔ ۱۱۸ لایه‌های قدیمی [04]–[12] (personnelV92، loanV93، vefaghV101،
+                             inventoryV94، adminV95، reportsV95، personToolsV95، printViewV95، settingsV95) را در همین بخش ادغام کرد؛
+                             شماره‌های [05]–[12] دیگر وجود ندارند و شمارهٔ بقیهٔ لایه‌ها عوض نشده است.
+     [13] dialogsV95 ....... پنجره‌های گفت‌وگو
+     [14] desktop1366V96 ... نمایشگر ۱۳۶۶×۷۶۸   [15] personnelLayoutV97 + سایدبار جمع‌شونده
+     [16] compact1366V103 .. فشرده‌سازی ۱۳۶۶     [18] refineV109 ..... پالایش نهایی (سربرگ غیرچسبان از نسخهٔ ۱۱۱)
+     [19] darkV111 ......... حالت تیرهٔ واقعی با متغیرهای CSS (کلاس html.ui-dark؛ ui/appearance.js)
+     [20] refreshV115 ...... نوسازی ظاهری (آخرین لایه؛ تغییرات ظاهری تازه اینجا)
+   قاعده: رنگ تازه را با توکن (var(--card)، var(--ink)، var(--line)، ...) بنویسید نه با #fff، تا حالت تیره و «ظاهر برنامه» خودکار کار کنند. */
+/* ======================================================================
+   [01] themeV89
+   ====================================================================== */
+/* >>> THEME-V89 BEGIN — لایهٔ ظاهریِ الهام‌گرفته از طرح Lovable «حقوق‌یار».
+   فقط ظاهر صفحه روی صفحهٔ نمایش (@media screen)؛ به چاپ، فیش، منطق و ساختار برنامه کاری ندارد.
+   بازگشت: کل این بلوک <style id="themeV89"> را حذف کنید. <style id="appCss"> دست‌نخورده است. */
+@media screen{
+  :root{
+    /* v119: این بلوک تنها جای تعریف توکن‌ها و پالت روشن روی صفحه است. پیش‌تر --bg، --line، --line-2، --ui-shadow و
+       --ui-shadow-raised در [01]، [18] و [20] چند بار با مقدار متفاوت تعریف می‌شدند و فقط آخری اثر داشت؛ حالا همان مقدار نهایی
+       (همان که روی صفحه دیده می‌شد) یک بار اینجا آمده است. پالت تیره: فقط بخش [19] (html.ui-dark). */
+    /* --- گوشه، سایه، حرکت --- */
+    --ui-radius:12px;--ui-radius-sm:10px;
+    --ui-control-h:42px;--ui-gap-xs:6px;--ui-gap-sm:8px;--ui-gap-md:10px;--ui-gap-lg:12px;   /* v119 (بند ۳۲): ارتفاع کنترل فرم و مقیاس فاصلهٔ gap */
+    --ui-radius-xs:8px;--ui-radius-pill:999px;--ui-shadow-pop:0 4px 10px -4px rgba(16,29,56,.5);
+    --ui-radius-lg:18px;   /* پنجره‌های گفت‌وگو (ورود، تغییر رمز، دیالوگ‌های عمومی) */
+    --ui-shadow:0 1px 2px rgba(16,24,40,.04),0 2px 8px -2px rgba(16,24,40,.06);
+    --ui-shadow-raised:0 2px 6px rgba(16,24,40,.05),0 18px 40px -16px rgba(16,24,40,.22);
+    --ui-shadow-btn:0 1px 2px rgba(16,24,40,.06);
+    --ui-shadow-dialog:0 2px 6px rgba(16,29,56,.06),0 28px 60px -22px rgba(16,29,56,.35);
+    --ui-ease:cubic-bezier(.2,.7,.2,1);
+    --ui-head-h:58px;
+    /* --- اندازهٔ نوشته (--fs-base = اندازهٔ متن بدنه در appCss) --- */
+    --fs-xs:12px;--fs-sm:12.5px;--fs-md:13px;--fs-md-plus:13.5px;--fs-base-sm:14px;--fs-base:14.5px;--fs-lg:16px;
+    /* --- رنگ اصلی و منوی کناری --- */
+    --ui-teal:#23928d;--ui-teal-soft:#dcf7f4;--ui-teal-ink:#005a59;
+    --ui-sb-primary:#44b2aa;--ui-sb-muted:#8f99a8;--ui-sb-fg:#e3e8ef;
+    --ui-input:#dee2e7;
+    --ui-ring:0 0 0 3px rgba(35,146,141,.22);
+    /* v118: مقدارهای تکراری لایه‌های [01]، [03]، [04] و [13] — رنگ خط کادرهای فیروزه‌ای/سبز، حاشیهٔ پیام خطا/هشدار و آیکن ذره‌بین جست‌وجو */
+    --ui-teal-line:#b7e6e1;--ui-emerald-line:#b6e6cb;--ui-red-line:rgba(211,58,60,.22);--ui-amber-line:rgba(187,115,27,.25);
+    --ui-search-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b95a5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+    /* --- پالت روشن (نام‌ها همان appCss؛ فقط مقدار) ---
+       سطح‌ها: --bg زمینهٔ صفحه، --card کارت (#fff از appCss)، --line-2 سطح کم‌رنگ، --ui-surface-2 سربرگ جدول و پیام خالی
+       خط‌ها: --line خط کارت و جدول، --ui-input حاشیهٔ فیلد و دکمه، --ui-*-line حاشیهٔ کادرهای رنگی
+       نوشته: --ink، --muted
+       معنایی: موفق = --emerald*، هشدار = --amber*، خطا = --red*، اطلاع = --blue* (هر کدام: رنگ / -soft زمینه / -ink نوشته) */
+    --bg:#f3f5f9;--ink:#121d30;--muted:#646c7b;--line:#e3e7ee;--line-2:#eff2f6;
+    --ui-surface-2:color-mix(in srgb,var(--line-2) 70%,var(--card));
+    --navy:#101d38;--navy-2:#1c2a49;--navy-3:#26324c;
+    --emerald:#1f8959;--emerald-soft:#def8e7;--emerald-ink:#085634;
+    --blue:#39659b;--blue-soft:#e7f1fe;
+    --amber:#bb731b;--amber-soft:#fff0d4;--amber-ink:#7a4702;
+    --red:#d33a3c;--red-soft:#ffece9;--red-ink:#972527;
+    --focus:#23928d;
+  }
+  /* ورقهٔ فیش (پیش‌نمایش روی صفحه) باید با چاپ یکی بماند: رنگ خط همان قبلی */
+  .sheet-wrap,.sheet,#preview{--line:#e2e8f0}
+
+  /* ---------- سایدبار ---------- */
+  /* v119: زمینه، رنگ و سایهٔ سایدبار، لوگو و دکمهٔ فعال منو در [20] تعریف می‌شوند (مقدارهای قبلی این‌جا هرگز اثر نداشتند) */
+  .side{color:var(--ui-sb-fg)}
+  .brand span{color:var(--ui-sb-muted)}
+  .nav button{border-radius:var(--ui-radius-sm)}
+  .nav button:hover{opacity:1}
+  .nav button.on{opacity:1}
+  .nav button:not(.on) svg.i{color:var(--ui-sb-muted)}
+  .conn{color:var(--ui-sb-fg);border-radius:var(--ui-radius-sm)}
+
+  /* ---------- صفحه، سربرگ و کارت‌ها ---------- */
+  .main{padding:20px 26px 44px}
+  .head{border:1px solid var(--line);border-radius:var(--ui-radius);box-shadow:var(--ui-shadow);padding:16px 22px}
+  .card,.stat,.toolbar,.pf-sec{border:1px solid var(--line);border-radius:var(--ui-radius)}
+  .card{padding:20px 22px}
+  .card > h2{color:var(--ink)}
+  .pf-hero{border-radius:var(--ui-radius);background:linear-gradient(135deg,var(--navy),var(--navy-2) 75%);box-shadow:var(--ui-shadow-raised)}
+  .banner{border-radius:var(--ui-radius-sm)}
+  .banner.blue{background:var(--navy-2)}
+  .banner.green{background:var(--emerald-ink)}
+  .tile{border-radius:var(--ui-radius-sm)}
+  .t-blue{background:var(--ui-teal-soft);color:var(--ui-teal)}
+  .mcard{border-radius:var(--ui-radius-sm)}
+
+  /* ---------- جدول‌ها (فقط table.tbl؛ جدول فیش و فرم‌ها دست‌نخورده) ---------- */
+  .badge{border-radius:var(--ui-radius-pill);padding:1px 11px}
+  .b-blue{background:var(--ui-teal-soft);color:var(--ui-teal-ink)}
+
+  /* ---------- دکمه‌ها و فیلدها ---------- */
+  .btn{border-radius:var(--ui-radius-sm);border-color:var(--ui-input)}
+  .btn:hover:not(:disabled){background:var(--line-2)}
+  .btn-main:hover:not(:disabled){background:var(--navy-2)}
+  .btn-blue{background:var(--ui-teal);border-color:var(--ui-teal)}
+  .btn-blue:hover:not(:disabled){background:var(--ui-teal-ink);border-color:var(--ui-teal-ink)}
+  .btn:focus-visible,.nav button:focus-visible{outline:none;box-shadow:var(--ui-ring)}
+  label.f input,label.f select,.inp{border-color:var(--ui-input);border-radius:var(--ui-radius-sm);transition:border-color .15s,box-shadow .15s}
+  label.f input:focus,label.f select:focus,.inp:focus{outline:none;border-color:var(--ui-teal);box-shadow:var(--ui-ring)}
+  .chips button.on{background:var(--navy);border-color:var(--navy)}
+  .plist .r.sel{background:var(--ui-teal-soft);border-color:var(--ui-teal-line)}
+}
+/* <<< THEME-V89 END */
+
+/* ======================================================================
+   [02] dashV90
+   ====================================================================== */
+/* >>> DASH-V90 BEGIN — بازطراحی ظاهری «فقط داشبورد» (الهام از داشبورد Lovable).
+   همهٔ قاعده‌ها با #page-dashboard محدود شده‌اند و داخل @media screen‌اند؛ سایر صفحه‌ها، چاپ و JavaScript دست‌نخورده‌اند.
+   بازگشت: کل این بلوک <style id="dashV90"> را حذف کنید. */
+@media screen{
+  #page-dashboard{
+    --ui-chart-1:#1c315b;--ui-chart-2:#2c9893;--ui-chart-3:#4476a0;--ui-chart-4:#88cdc8;--ui-chart-soft:#cbd9ec;
+  }
+  /* ----- سربرگ: به‌جای نوار گرادیانی، سربرگ تمیزِ کارتی مثل Lovable ----- */
+  #page-dashboard .dash-hero{border-radius:var(--ui-radius);padding:20px 24px;gap:14px 18px;margin-bottom:18px}
+  #page-dashboard .dh-main h2{font-size:22px;margin-bottom:3px}
+  #page-dashboard .dh-main p{color:var(--muted);font-size:var(--fs-md)}
+  #page-dashboard .dh-chip{color:var(--muted);padding:3px 12px}
+  #page-dashboard .dh-acts{flex:1 0 100%;border-top:1px solid var(--line-2);padding-top:14px;gap:var(--ui-gap-sm)}
+  #page-dashboard .btn-hero{padding:6px 14px;font-size:var(--fs-md)}
+  #page-dashboard .btn-hero:hover{background:var(--line-2)}
+  #page-dashboard .btn-hero .kbd{color:var(--muted)}
+  #page-dashboard .btn-hero .kbd:empty{display:none}
+
+  /* ----- کارت‌های شاخص: آیکن بالا-کنار، عدد درشت، پاورقیِ جداشده (بدون تغییر HTML) ----- */
+  #page-dashboard .kpi-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:16px}
+  #page-dashboard .kpi{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"lab tile" "val val" "sub sub";
+    align-items:start;column-gap:12px;border:1px solid var(--line);border-radius:var(--ui-radius);
+    box-shadow:var(--ui-shadow);padding:18px 20px}
+  #page-dashboard .kpi-t{display:contents}
+  #page-dashboard .kpi-t small{grid-area:lab;align-self:center;font-size:var(--fs-md);font-weight:500;color:var(--muted);line-height:1.6}
+  #page-dashboard .kpi-t .tile{grid-area:tile;width:40px;height:40px;border-radius:var(--ui-radius-sm)}
+  #page-dashboard .kpi-t .tile .i{width:20px;height:20px}
+  #page-dashboard .kpi b{grid-area:val;margin-top:8px;font-size:26px;line-height:1.4}
+  #page-dashboard .kpi-sub{grid-area:sub;margin-top:12px;padding-top:12px;border-top:1px solid var(--line-2);font-size:var(--fs-xs);color:var(--muted)}
+  #page-dashboard .kpi .tile.t-blue{background:var(--navy);color:#fff}
+  #page-dashboard .kpi .tile.t-teal{background:var(--ui-teal-soft);color:var(--ui-teal)}
+  #page-dashboard .kpi.clk:hover{transform:translateY(-2px);box-shadow:var(--ui-shadow-raised)}
+
+  /* ----- کارت‌ها و عنوان بخش‌ها ----- */
+  #page-dashboard .card > h2{font-size:var(--fs-lg);font-weight:700}
+  #page-dashboard .g2,#page-dashboard .g-chart{gap:18px}
+  #page-dashboard .al-row,#page-dashboard .since-grid>div,#page-dashboard .dl{border-radius:var(--ui-radius-sm)}
+  #page-dashboard .al-row.clk:hover{background:var(--ui-teal-soft)}
+  #page-dashboard .al-row span.go{color:var(--ui-teal-ink);font-weight:600}
+  #page-dashboard .since-grid>div{border:1px solid var(--line-2)}
+
+  /* ----- کارت‌های کدهای مهم ----- */
+  #page-dashboard .kc{background:var(--card);border-radius:var(--ui-radius);border-color:var(--line)}
+  #page-dashboard .kc.clk:hover{box-shadow:var(--ui-shadow-raised)}
+  #page-dashboard .kc-h .code{background:var(--ui-teal-soft);color:var(--ui-teal-ink)}
+  #page-dashboard .kc-off{background:var(--line-2)}
+
+  /* ----- نمودارها: هم‌رنگ‌سازی با پالت طرح (فقط ظاهر SVG؛ داده و منطق نمودار دست‌نخورده) ----- */
+  #page-dashboard .chart-box line{stroke:var(--line);stroke-dasharray:3 4}
+  #page-dashboard #dChartTrend rect[fill="#2563eb"]{fill:var(--ui-chart-1)}
+  #page-dashboard #dChartTrend rect[fill="#f59e0b"]{fill:var(--ui-chart-2)}
+  #page-dashboard #dChartTrend .legend i[style*="#2563eb"]{background:var(--ui-chart-1)!important}
+  #page-dashboard #dChartTrend .legend i[style*="#f59e0b"]{background:var(--ui-chart-2)!important}
+  #page-dashboard #dChartBars stop[stop-color="#60a5fa"]{stop-color:var(--ui-chart-3)}
+  #page-dashboard #dChartBars stop[stop-color="#2563eb"]{stop-color:var(--ui-chart-1)}
+  #page-dashboard #dChartBars stop[stop-color="#a78bfa"]{stop-color:var(--ui-chart-4)}
+  #page-dashboard #dChartBars stop[stop-color="#7c3aed"]{stop-color:var(--ui-chart-2)}
+  #page-dashboard #dChartBars text[fill="#1e3a8a"]{fill:var(--ui-chart-1)}
+  #page-dashboard #dChartBars text[fill="#7c3aed"]{fill:var(--ui-teal-ink)}
+  #page-dashboard #dChartDonut circle[stroke="#10b981"]{stroke:var(--emerald)}
+  #page-dashboard #dChartDonut circle[stroke="#f59e0b"]{stroke:var(--amber)}
+  #page-dashboard #dChartDonut circle[stroke="#ef4444"]{stroke:var(--red)}
+  #page-dashboard #dChartDonut .legend i[style*="#10b981"]{background:var(--emerald)!important}
+  #page-dashboard #dChartDonut .legend i[style*="#f59e0b"]{background:var(--amber)!important}
+  #page-dashboard #dChartDonut .legend i[style*="#ef4444"]{background:var(--red)!important}
+  #page-dashboard #dChartDonut text[fill="#0f172a"]{fill:var(--ink)}
+  #page-dashboard .kc svg rect[fill="#4f46e5"]{fill:var(--ui-chart-1)}
+  #page-dashboard .kc svg rect[fill="#c7d2fe"]{fill:var(--ui-chart-soft)}
+  #page-dashboard .hb-bar{background:var(--line-2)}
+  #page-dashboard .hb-bar i{background:linear-gradient(90deg,var(--ui-chart-1),var(--ui-chart-3))}
+}
+@media screen and (max-width:640px){
+  #page-dashboard .dash-hero{padding:16px 16px}
+  #page-dashboard .dh-main h2{font-size:19px}
+  #page-dashboard .dh-main{min-width:0;flex-basis:100%}
+  #page-dashboard .btn-hero{padding:5px 11px;font-size:var(--fs-sm)}
+  #page-dashboard .kpi-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--ui-gap-lg)}
+  #page-dashboard .kpi{padding:14px 14px}
+  #page-dashboard .kpi b{font-size:22px}
+  #page-dashboard .g2,#page-dashboard .g-chart{gap:14px}
+}
+/* <<< DASH-V90 END */
+
+/* ======================================================================
+   [03] authV91
+   ====================================================================== */
+/* >>> AUTH-V91 BEGIN — بازطراحی ظاهری «فقط» پنجرهٔ ورود (#loginWrap) و پنجرهٔ تغییر رمز (دیالوگی که فیلدهای old/n1/n2 دارد).
+   فقط CSS و فقط روی صفحهٔ نمایش (@media screen)؛ HTML، JavaScript، شناسه‌ها و منطق ورود/تغییر رمز دست‌نخورده‌اند.
+   پنجرهٔ تغییر رمز با :has() شناسایی می‌شود؛ در مرورگر قدیمی که :has() ندارد همان ظاهر قبلی (v90) می‌ماند.
+   بازگشت: کل این بلوک <style id="authV91"> را حذف کنید. */
+@media screen{
+  /* ---------- صفحهٔ ورود ---------- */
+  #loginWrap{overflow:auto;padding:20px}
+  #loginWrap .modalBox{max-width:440px!important;padding:34px 32px 28px;border:1px solid var(--line);border-radius:var(--ui-radius-lg);
+    box-shadow:0 2px 6px rgba(16,29,56,.06),0 28px 60px -22px rgba(16,29,56,.28);max-height:none}
+  #loginWrap .modalBox::before{content:"";display:block;width:60px;height:60px;margin:0 auto 18px;border-radius:18px;background:var(--navy) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1'/%3E%3Cpath d='M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4'/%3E%3C/svg%3E") center/30px no-repeat}
+  #loginWrap h3{text-align:center;font-size:22px;font-weight:700;color:var(--ink);margin-bottom:6px!important}
+  #loginWrap .hint{text-align:center;color:var(--muted);font-size:var(--fs-md-plus)}
+  #loginWrap p.hint{margin-bottom:22px!important}
+  #loginWrap label.f{margin-bottom:16px!important;font-size:var(--fs-md);font-weight:600;color:var(--ink);gap:7px}
+  #loginWrap label.f input{height:46px;padding:0 14px;font-size:var(--fs-base);border-radius:var(--ui-radius)}
+  #loginWrap #loginConn{border:1px solid var(--line)!important;background:var(--line-2);border-radius:var(--ui-radius)!important;padding:14px!important;margin-top:2px!important}
+  #loginWrap #loginConn .hint{text-align:start;font-size:var(--fs-sm)}
+  #loginWrap #loginConn label.f{margin-bottom:12px!important}
+  #loginWrap #loginConnToggle{display:block;text-align:center;color:var(--ui-teal-ink);text-decoration:none;font-size:var(--fs-sm);margin-top:4px}
+  #loginWrap #loginConnToggle:hover{text-decoration:underline}
+  #loginWrap #loginErr{text-align:start}
+  #loginWrap #loginErr:empty{min-height:0!important;margin:0!important}
+  #loginWrap #loginErr:not(:empty){background:var(--red-soft);border:1px solid var(--ui-red-line);border-radius:var(--ui-radius);padding:10px 14px;color:var(--red-ink)!important;margin-top:14px!important;line-height:1.8}
+  #loginWrap .row-end{margin-top:18px}
+  #loginWrap #btnLogin{height:46px;min-height:46px;font-size:15px;font-weight:700;border-radius:var(--ui-radius);box-shadow:0 6px 16px -6px rgba(16,29,56,.5)}
+
+  /* ---------- پنجرهٔ تغییر رمز عبور (اجباری و عادی) ---------- */
+  :is(.modalWrap):has(input[name="old"]):has(input[name="n1"]):has(input[name="n2"]){background:rgba(16,29,56,.55)}
+  :is(.modalWrap):has(input[name="old"]):has(input[name="n1"]):has(input[name="n2"]) .modalBox{max-width:440px!important;padding:30px 30px 24px;border:1px solid var(--line);border-radius:var(--ui-radius-lg);box-shadow:var(--ui-shadow-dialog)}
+  :is(.modalWrap):has(input[name="old"]):has(input[name="n1"]):has(input[name="n2"]) .modalBox::before{content:"";display:block;width:54px;height:54px;margin:0 auto 14px;border-radius:16px;background:var(--ui-teal-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23005a59' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E") center/26px no-repeat}
+  :is(.modalWrap):has(input[name="old"]):has(input[name="n1"]):has(input[name="n2"]) h3{text-align:center;font-size:20px;font-weight:700;color:var(--ink);margin-bottom:8px!important}
+  :is(.modalWrap):has(input[name="old"]):has(input[name="n1"]):has(input[name="n2"]) .hint{text-align:center;color:var(--muted);font-size:var(--fs-md-plus);line-height:1.9;margin-bottom:16px!important}
+  :is(.modalWrap):has(input[name="old"]):has(input[name="n1"]):has(input[name="n2"]) label.f{margin-bottom:14px!important;font-size:var(--fs-md);font-weight:600;color:var(--ink);gap:7px}
+  :is(.modalWrap):has(input[name="old"]):has(input[name="n1"]):has(input[name="n2"]) label.f input{height:46px;padding:0 14px;font-size:var(--fs-base);border-radius:var(--ui-radius);background:#fff}
+  :is(.modalWrap):has(input[name="old"]):has(input[name="n1"]):has(input[name="n2"]) .dlg-err{min-height:0!important;margin-top:0!important}
+  :is(.modalWrap):has(input[name="old"]):has(input[name="n1"]):has(input[name="n2"]) .dlg-err:not(:empty){background:var(--red-soft);border:1px solid var(--ui-red-line);border-radius:var(--ui-radius);padding:10px 14px;color:var(--red-ink)!important;margin-top:4px!important;line-height:1.8}
+  :is(.modalWrap):has(input[name="old"]):has(input[name="n1"]):has(input[name="n2"]) .row-end{margin-top:16px}
+  :is(.modalWrap):has(input[name="old"]):has(input[name="n1"]):has(input[name="n2"]) .row-end .btn:only-child{flex:1 1 100%;width:100%}
+  :is(.modalWrap):has(input[name="old"]):has(input[name="n1"]):has(input[name="n2"]) .row-end .btn{min-height:46px;border-radius:var(--ui-radius);font-size:var(--fs-base);font-weight:700}
+}
+@media screen and (max-width:480px){
+  #loginWrap{padding:12px;align-items:flex-start;padding-top:8vh}
+  #loginWrap .modalBox{padding:26px 20px 22px;border-radius:16px}
+  :is(.modalWrap):has(input[name="old"]):has(input[name="n1"]):has(input[name="n2"]) .modalBox{padding:24px 20px 20px}
+}
+/* <<< AUTH-V91 END */
+
+/* ======================================================================
+   [04] pagesV118 — اجزای مشترک صفحه‌ها + قاعده‌های ویژهٔ هر صفحه
+   ====================================================================== */
+/* >>> PAGES-V118 BEGIN — یکپارچه‌سازی لایه‌های قدیمی هر صفحه (personnelV92، loanV93، vefaghV101، inventoryV94، adminV95،
+   reportsV95، personToolsV95، printViewV95، settingsV95). آن لایه‌ها همان قاعده‌ها را صفحه‌به‌صفحه تکرار می‌کردند؛
+   اینجا هر جزء (زبانه، نوار فرد، فیلد، پیام، خلاصه، جدول، ...) یک بار نوشته شده و فهرست صفحه‌هایش در :is(...) آمده است.
+   :is() با فهرستی از شناسه‌ها همان ویژگی (specificity) یک شناسه را دارد، پس آبشار عیناً مثل قبل است
+   (تأیید: tests/css_harness.py در حالت آفلاین و --mock، صفر تفاوت).
+   صفحهٔ تازه: شناسهٔ #page-… را به فهرست اجزایی که لازم دارد اضافه کنید؛ قاعدهٔ ویژهٔ صفحه را در بخش «ویژهٔ صفحه‌ها» بنویسید.
+   هر صفحه فقط در یکی از گروه‌های «ویژهٔ صفحه‌ها» می‌آید. همه داخل @media screen‌اند؛ چاپ و <style id="appCss"> دست‌نخورده‌اند. */
+@media screen{
+  /* ---------- اجزای مشترک ---------- */
+  /* زبانه‌های بالای صفحه (.rp-tabs) و تراشه‌های تنظیمات */
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-goods,#page-services,#page-reports,#page-life,#page-insurance,#page-changes,#page-cheque) .rp-tabs{gap:var(--ui-gap-sm)}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-goods,#page-services,#page-reports,#page-life,#page-insurance,#page-changes,#page-cheque) .rp-tabs button{padding:8px 18px;font-weight:600;border-color:var(--ui-input);transition:background .15s,border-color .15s}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-goods,#page-services,#page-reports,#page-life,#page-insurance,#page-changes,#page-cheque) .rp-tabs button:hover:not(.on),
+  #page-settings .chips button:hover:not(.on){background:var(--line-2)}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-goods,#page-services,#page-reports,#page-life,#page-insurance,#page-changes,#page-cheque) .rp-tabs button.on,
+  #page-settings .chips button.on{background:var(--navy);border-color:var(--navy);box-shadow:var(--ui-shadow-pop)}
+
+  /* نوار انتخاب فرد (.pbar) با جست‌وجوی ذره‌بین‌دار */
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-goods,#page-services,#page-life,#page-insurance,#page-changes,#page-cheque) .pbar{padding:14px 18px;gap:14px 18px}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-goods,#page-services,#page-life,#page-insurance,#page-changes,#page-cheque) .pbar .inp{height:var(--ui-control-h);border-radius:var(--ui-radius-sm);background:#fff var(--ui-search-icon) no-repeat right 12px center/16px;padding-inline-start:38px}
+
+  /* عنوان کارت‌ها و راهنماها */
+  :is(#page-personnel,#page-deceased,#page-schools,#page-statushistory,#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-slips,#page-cheque,#page-settings) .card > h2{font-size:var(--fs-lg);font-weight:700}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-cheque,#page-settings) .hint{line-height:2}
+
+  /* پیام‌های داخل صفحه (.pf-msg) و حاشیهٔ رنگی هشدار/خطا. v118: کلاس‌های u-bg-red-soft / u-bg-amber-soft (نسخهٔ ۱۱۷، به‌جای style درون‌خطی)
+     در همهٔ صفحه‌ها پذیرفته می‌شوند؛ پیش‌تر فقط صفحه‌های وام آن‌ها را می‌شناختند و حاشیهٔ پیام در وفاق، چک، تغییرات ماهانه و خدمات سبز (رنگ پیام موفق) دیده می‌شد. پیام قرمز صفحهٔ چک هم اضافه شد. */
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-life,#page-insurance,#page-changes,#page-cheque) .pf-msg{padding:11px 16px;border-radius:var(--ui-radius-sm);font-size:var(--fs-md);line-height:1.9}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-life,#page-insurance,#page-changes,#page-cheque) .pf-msg:is([style*="red-soft"],.u-bg-red-soft){border:1px solid var(--ui-red-line)}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-life,#page-insurance,#page-changes,#page-cheque) .pf-msg:is([style*="amber-soft"],.u-bg-amber-soft){border:1px solid var(--ui-amber-line)}
+
+  /* فرم‌ها: فاصلهٔ شبکه، برچسب و ارتفاع فیلدها */
+  :is(#page-statushistory,#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-goods,#page-services,#page-institutions,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-cheque) .fgrid,
+  #page-cheque .cq4{gap:14px 16px}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-goods,#page-services,#page-institutions,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-cheque) .fgrid label.f,
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh) .cap-form label.f,
+  #page-cheque .cq4 label.f{font-size:var(--fs-sm);font-weight:600;color:var(--muted);gap:var(--ui-gap-xs)}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh) :is(.fgrid,.cap-form) label.f input:not([type=checkbox]):not([type=radio]),
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh) .fgrid label.f select,
+  :is(#page-goods,#page-services,#page-institutions,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-cheque) .fgrid label.f input:not([type=checkbox]):not([type=radio]):not([type=file]),
+  :is(#page-goods,#page-services,#page-institutions,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-cheque) .fgrid label.f select,
+  #page-cheque .cq4 label.f input:not([type=checkbox]):not([type=radio]):not([type=file]),
+  #page-cheque .cq4 label.f select,
+  :is(#page-reports,#page-import) .prow label.f input,
+  :is(#page-reports,#page-import) .prow label.f select{height:var(--ui-control-h)}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-life,#page-insurance,#page-changes) .fgrid input[readonly]{background:var(--line-2);color:var(--muted)}
+
+  /* خلاصهٔ محاسبه (.wk-sum) */
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-reports,#page-import,#page-life,#page-insurance,#page-changes) .wk-sum{gap:var(--ui-gap-lg)}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-reports,#page-import,#page-life,#page-insurance,#page-changes) .wk-sum div{border:1px solid var(--line);border-radius:var(--ui-radius-sm);padding:12px 16px;background:var(--line-2)}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-reports,#page-import,#page-life,#page-insurance,#page-changes) .wk-sum b{font-size:17px;margin-top:2px}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-life,#page-insurance,#page-changes) .wk-sum .big{background:var(--emerald-soft);border-color:var(--ui-emerald-line)}
+
+  /* دکمه‌های پایین فرم (.wk-acts) و دکمه‌های داخل جدول */
+  :is(#page-personnel,#page-deceased,#page-schools,#page-statushistory,#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-cheque,#page-settings) .wk-acts{gap:var(--ui-gap-md)}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-cheque) .wk-acts{margin-top:18px;padding-top:16px;border-top:1px solid var(--line-2)}
+  :is(#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-users,#page-dcodes,#page-closing,#page-life,#page-insurance,#page-changes) .wk-tbl-act{flex-wrap:wrap}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-cheque) .wk-tbl-act .btn{border-radius:var(--ui-radius-xs)}
+
+  /* جدول‌ها، نشان‌ها، نوار ابزار، پیام خالی، نمودار */
+  :is(#page-personnel,#page-deceased,#page-schools,#page-statushistory,#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-cheque,#page-settings) .tbl-wrap{border:1px solid var(--line);border-radius:var(--ui-radius-sm);background:var(--card)}
+  :is(#page-personnel,#page-deceased,#page-schools,#page-statushistory,#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-cheque,#page-settings) table.tbl tbody tr.clk:hover td{background:var(--ui-teal-soft)}
+  :is(#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-cheque,#page-settings) .badge{border-radius:var(--ui-radius-pill)}
+  :is(#page-loans,#page-life,#page-insurance,#page-changes,#page-settings) .toolbar{gap:var(--ui-gap-lg)}
+  :is(#page-personnel,#page-deceased,#page-schools,#page-statushistory,#page-slips) .empty{border-radius:var(--ui-radius);border-color:var(--ui-input);background:var(--line-2)}
+  :is(#page-loans,#page-reports) .chart-box{max-width:none}
+
+  /* انتخاب فایل (بانک‌ها و تنظیمات) */
+  :is(#page-banks,#page-settings) input[type=file]{max-width:100%;font-size:var(--fs-md);color:var(--muted)}
+  :is(#page-banks,#page-settings) input[type=file]::file-selector-button{margin-inline-end:12px;height:36px;padding:0 14px;border:1px solid var(--ui-input);border-radius:var(--ui-radius-sm);background:var(--card);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+  :is(#page-banks,#page-settings) input[type=file]::file-selector-button:hover{background:var(--line-2)}
+
+  /* ---------- ویژهٔ صفحه‌ها ---------- */
+  /* پرسنل، درگذشتگان، مدارس و آموزشگاه‌ها، تاریخچهٔ وضعیت (رنگ‌بندی وضعیت پرسنل عمداً حفظ شده است) */
+  :is(#page-personnel,#page-deceased,#page-schools,#page-statushistory) .card > h2 .badge{font-size:var(--fs-xs)}
+  #page-personnel .pf-layout{grid-template-columns:344px minmax(0,1fr);gap:20px}
+  #page-personnel .pf-side{padding:18px;gap:var(--ui-gap-lg)}
+  #page-personnel .pf-side .inp{height:44px;border-radius:var(--ui-radius-sm);font-size:var(--fs-base-sm)}
+  #page-personnel #personnelSearch{background:#fff var(--ui-search-icon) no-repeat right 13px center/17px;padding-inline-start:40px}
+  #page-personnel #personnelBy{height:40px;font-size:var(--fs-md);color:var(--muted)}
+  #page-personnel .pf-side > .hint{line-height:2}
+  #page-personnel .chips button{padding:5px 14px;transition:background .15s,border-color .15s}
+  #page-personnel .chips button:hover:not(.on){background:var(--line-2)}
+  #page-personnel .plist{margin-inline:-6px;padding-inline:6px}
+  #page-personnel .plist .r{padding:9px 10px;border-radius:var(--ui-radius-sm);margin-bottom:2px}
+  #page-personnel .plist .r .nm b{color:var(--ink)}
+  #page-personnel .plist .r.sel{background:var(--ui-teal-soft);border-top-color:var(--ui-teal-line);border-bottom-color:var(--ui-teal-line);border-left-color:var(--ui-teal-line)}
+  #page-personnel .plist .r.sel.st-active{border-right-color:#3b82f6}
+  #page-personnel .plist .r.sel.st-ret{border-right-color:#f59e0b}
+  #page-personnel .plist .r.sel.st-heir{border-right-color:#8b5cf6}
+  #page-personnel .plist .r.sel.st-off{border-right-color:#9ca3af}
+  #page-personnel .plist .r.sel.st-dead{border-right-color:#111827}
+  #page-personnel .plist .av{width:36px;height:36px}
+  #page-personnel .prow .btn{min-width:72px}
+  #page-personnel #btnPersonnelXlsx{border-radius:var(--ui-radius-sm)}
+  #page-personnel .pf-main{gap:18px}
+  #page-personnel .pf-hero{border-radius:var(--ui-radius);box-shadow:var(--ui-shadow-raised);padding:22px 26px;gap:20px}
+  #page-personnel .pf-hero h2{font-size:24px}
+  #page-personnel .pf-hero .sub{gap:var(--ui-gap-sm) 18px}
+  #page-personnel .pf-hero .net{border-radius:var(--ui-radius-sm);padding:12px 20px}
+  #page-personnel .pf-hero .av.lg{border-radius:16px;border:2px solid rgba(255,255,255,.4);box-shadow:0 8px 20px -8px rgba(0,0,0,.45)}
+  #page-personnel .pf-hero .btn-hero{border-radius:var(--ui-radius-sm)}
+  #page-personnel .pf-sec{border:1px solid var(--line);border-radius:var(--ui-radius);box-shadow:var(--ui-shadow);padding:20px 22px}
+  #page-personnel .pf-sec > h3{font-size:var(--fs-lg);font-weight:700;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line-2)}
+  #page-personnel .pf-sec > h3 .i{color:var(--ui-teal)}
+  #page-personnel .pf-sec.editing{outline:none;border-color:var(--ui-teal);box-shadow:var(--ui-ring),var(--ui-shadow)}
+  #page-personnel .pf-grid{gap:var(--ui-gap-lg) 14px}
+  #page-personnel .fld{border-radius:var(--ui-radius-sm);padding:9px 14px;border:1px solid transparent}
+  #page-personnel .fld small{font-size:var(--fs-xs)}
+  #page-personnel .fld.ef{border-color:var(--ui-input)}
+  #page-personnel .fld.ef:focus-within{border-color:var(--ui-teal);box-shadow:var(--ui-ring)}
+  #page-personnel .fld.ef .inp{border:0;background:transparent;box-shadow:none;padding-inline:0}
+  #page-personnel .fld.ef .inp:focus{box-shadow:none}
+  #page-personnel .seg{border-radius:var(--ui-radius-sm)}
+  #page-personnel .seg span{border-radius:var(--ui-radius-xs)}
+  #page-personnel .mgrid{gap:var(--ui-gap-lg)}
+  #page-personnel .mcard{border-radius:var(--ui-radius-sm);padding:12px 16px}
+  #page-personnel .mcard.hl{background:var(--emerald-soft);border-color:var(--ui-emerald-line)}
+  #page-personnel .notes{border-radius:var(--ui-radius-sm)}
+  #page-personnel .pf-msg{background:var(--emerald-soft);border-color:var(--ui-emerald-line);border-radius:var(--ui-radius-sm)}
+  #page-personnel .pf-dead{border-radius:var(--ui-radius-sm)}
+  #page-schools .chips,#page-deceased .chips{background:var(--line-2);display:inline-flex;padding:4px;border-radius:var(--ui-radius-sm);border:1px solid var(--line)}
+  #page-schools .chips button{border-color:transparent;background:transparent;padding:6px 16px;border-radius:var(--ui-radius-xs)}
+  #page-schools .chips button.on{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:0 1px 2px rgba(16,29,56,.10)}
+  #page-statushistory .fgrid label.f,#page-deceased label.f,#page-schools label.f{font-weight:600;font-size:var(--fs-md)}
+  #page-statushistory .btn.sm{border-radius:var(--ui-radius-pill);background:var(--ui-teal-soft);border-color:transparent;color:var(--ui-teal-ink)}
+
+  /* گزارش وام (#page-loans): زبانه‌های نوبت و ردیف‌های نوبت */
+  #page-loans #lqTabs{gap:var(--ui-gap-sm)!important}
+  #page-loans #lqTabs .btn{border-radius:var(--ui-radius-pill);padding:8px 18px;font-weight:600;border-color:var(--ui-input)}
+  #page-loans #lqTabs .btn.btn-blue{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:var(--ui-shadow-pop)}
+  #page-loans .lqSectionTitle{font-size:var(--fs-base-sm);margin:18px 0 10px}
+  #page-loans .lqRow{padding:14px 16px;border:1px solid var(--line);border-radius:var(--ui-radius);margin-bottom:10px;background:var(--card);line-height:2;transition:background .15s,border-color .15s}
+  #page-loans .lqRow.clk:hover{background:var(--ui-teal-soft);border-color:var(--ui-teal-line)}
+  #page-loans .lqRow .lqInfo b{display:inline}
+  #page-loans .lqRow .lqInfo > b:first-child{display:block;font-size:var(--fs-base)}
+
+  /* انبار، درخواست کالا و خدمات، موسسات، بانک‌ها */
+  :is(#page-goods,#page-services,#page-institutions) .fgrid textarea.inp{min-height:96px;border-radius:var(--ui-radius-sm)}
+  #page-institutions .radios{gap:var(--ui-gap-md) 20px;padding:12px 14px;margin-top:14px;background:var(--line-2);border:1px solid var(--line);border-radius:var(--ui-radius-sm)}
+  #page-institutions .radios input{accent-color:var(--ui-teal)}
+  #page-inventory .toolbar{border:1px solid var(--line);border-radius:var(--ui-radius);box-shadow:var(--ui-shadow);padding:14px 16px;gap:var(--ui-gap-lg)}
+  #page-inventory .toolbar .inp{height:var(--ui-control-h);border-radius:var(--ui-radius-sm)}
+  #page-inventory .badge.b-red{border-radius:var(--ui-radius-pill)}
+  #page-banks input:not([type=checkbox]):not([type=radio]):not([type=file]){height:var(--ui-control-h);padding:0 12px;border:1px solid var(--ui-input);border-radius:var(--ui-radius-sm);background:#fff;color:var(--ink);font-size:var(--fs-base-sm);min-width:0;transition:border-color .15s,box-shadow .15s}
+  #page-banks input:not([type=checkbox]):not([type=radio]):not([type=file]):focus{outline:none;border-color:var(--ui-teal);box-shadow:var(--ui-ring)}
+  #page-banks .grid{gap:20px}
+  #page-banks .grid > *{min-width:0}
+  #page-banks .sub{min-width:0}
+  #page-banks .tbl-wrap{overflow-x:auto}
+
+  /* مدیریت کاربران، تعریف کد کسر، بستن فایل حقوق */
+  #page-users .toolbar{border:1px solid var(--line);border-radius:var(--ui-radius);box-shadow:var(--ui-shadow);padding:14px 18px;gap:var(--ui-gap-lg)}
+  #page-users .toolbar b{font-size:var(--fs-lg)}
+  #page-dcodes #dc-q{height:var(--ui-control-h);width:100%;padding:0 12px 0 38px;border:1px solid var(--ui-input);border-radius:var(--ui-radius-sm);background:#fff var(--ui-search-icon) no-repeat right 12px center/16px;color:var(--ink);font-size:var(--fs-base-sm);margin-bottom:12px!important;transition:border-color .15s,box-shadow .15s}
+  #page-dcodes #dc-q:focus{outline:none;border-color:var(--ui-teal);box-shadow:var(--ui-ring)}
+  #page-dcodes tr.selrow td{background:var(--ui-teal-soft)}
+  #page-closing #cr-body{margin-top:16px}
+  #page-closing #cl-save{min-height:42px;border-radius:var(--ui-radius-sm)}
+
+  /* تغذیهٔ فایل‌های اکسل (#page-import) */
+  #page-import .banner{border-radius:var(--ui-radius-sm);padding:14px 18px;margin-bottom:18px}
+  #page-import .prow{gap:var(--ui-gap-lg)}
+  #page-import .prow .btn{min-height:42px;border-radius:var(--ui-radius-sm)}
+  #page-import .g2{gap:18px}
+  #page-import .up{gap:var(--ui-gap-lg)}
+  #page-import .up .hd h3{font-size:15px;font-weight:700}
+  #page-import .up .tile{width:42px;height:42px;border-radius:var(--ui-radius-sm)}
+  #page-import .drop{border:1.5px dashed var(--ui-input);border-radius:var(--ui-radius);padding:20px 14px;background:var(--line-2);transition:border-color .15s,background .15s}
+  #page-import .drop:hover,
+  #page-import .drop.over{border-color:var(--ui-teal);background:var(--ui-teal-soft)}
+  #page-import .sample{color:var(--ui-teal-ink)}
+  #page-import .filemeta{padding:8px 12px;border-radius:var(--ui-radius-sm);background:var(--line-2)}
+  #page-import .console{border-radius:var(--ui-radius);box-shadow:var(--ui-shadow)}
+
+  /* فیش حقوقی (#page-slips: فقط نوار ابزار و پنل‌های کنار، نه .sheet) و صدور دسته چک (#page-cheque: نامهٔ چاپی دست‌نخورده) */
+  #page-slips .toolbar{border:1px solid var(--line);border-radius:var(--ui-radius);box-shadow:var(--ui-shadow);padding:14px 16px;gap:var(--ui-gap-lg);margin-bottom:18px}
+  #page-slips .toolbar .inp{height:var(--ui-control-h);border-radius:var(--ui-radius-sm)}
+  #page-slips #search{background:#fff var(--ui-search-icon) no-repeat right 12px center/16px;padding-inline-start:38px}
+  #page-slips .toolbar .btn{min-height:42px;border-radius:var(--ui-radius-sm)}
+  #page-slips #empList{border:1px solid var(--line);border-radius:var(--ui-radius-sm);padding:6px;background:#fff;font-size:var(--fs-md)}
+  #page-slips #empList option{padding:8px 10px;border-radius:var(--ui-radius-xs);margin-bottom:1px}
+  #page-slips #empList option:checked{background:linear-gradient(var(--ui-teal-soft),var(--ui-teal-soft));color:var(--ink)}
+  #page-slips .sum{padding:8px 0;border-bottom:1px dashed var(--line)}
+  #page-slips .sum.total{background:var(--emerald-soft);border:1px solid var(--ui-emerald-line);border-radius:var(--ui-radius-sm);padding:10px 14px;margin-top:10px}
+  #page-cheque .cq-sec{color:var(--ink);font-size:var(--fs-md-plus);margin:16px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--line-2)}
+
+  /* اتصال و تنظیمات (#page-settings) — طراح فرم‌های چاپی فقط پوستهٔ اطراف */
+  #page-settings .chips{gap:var(--ui-gap-sm);flex-wrap:wrap}
+  #page-settings .chips button{padding:7px 16px;font-weight:600;border-color:var(--ui-input);transition:background .15s,border-color .15s}
+  #page-settings .card{padding:22px 24px}
+  #page-settings .card > h2 .i{color:var(--ui-teal)}
+  #page-settings .card:not(#plCard) label.f{font-size:var(--fs-sm);font-weight:600;color:var(--muted);gap:var(--ui-gap-xs)}
+  #page-settings .card:not(#plCard) label.f input:not([type=checkbox]):not([type=radio]):not([type=file]),
+  #page-settings .card:not(#plCard) label.f select{height:var(--ui-control-h)}
+  #page-settings label.f textarea,
+  #page-settings textarea.inp{border-radius:var(--ui-radius-sm);border-color:var(--ui-input)}
+  #page-settings .card:not(#plCard) .toolbar .inp{height:var(--ui-control-h);border-radius:var(--ui-radius-sm)}
+  #page-settings input[type=checkbox],
+  #page-settings input[type=radio]{accent-color:var(--ui-teal)}
+  #page-settings .filemeta{border-radius:var(--ui-radius-sm)}
+  #page-settings .dz-sec{color:var(--ink);font-weight:700}
+}
+@media screen and (max-width:1100px){
+  #page-personnel .pf-layout{grid-template-columns:1fr}
+}
+@media screen and (max-width:640px){
+  /* اجزای مشترک */
+  :is(#page-deceased,#page-schools,#page-statushistory,#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-cheque,#page-settings) .card{padding:16px 14px}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-goods,#page-services,#page-institutions,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes) .fgrid .span2,
+  #page-cheque .cq4 :is(.c2,.c3,.c4){grid-column:1/-1}
+  :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-inventory,#page-goods,#page-services,#page-institutions,#page-banks,#page-users,#page-dcodes,#page-closing,#page-reports,#page-import,#page-life,#page-insurance,#page-changes,#page-cheque,#page-settings) .wk-acts .btn{flex:1 1 auto}
+  :is(#page-inventory,#page-users,#page-slips) .toolbar > *{flex:1 1 100%}
+  /* ویژهٔ صفحه‌ها */
+  #page-personnel .pf-side{padding:14px}
+  #page-personnel .pf-hero{padding:16px}
+  #page-personnel .pf-hero h2{font-size:20px}
+  #page-personnel .pf-sec{padding:16px 14px}
+  #page-personnel .pf-hero .av.lg{width:84px;height:100px}
+  #page-loans .lqRow{flex-direction:column;align-items:stretch}
+  #page-loans .lqRow .lqActs{justify-content:flex-end}
+  #page-banks .grid{grid-template-columns:1fr}
+  #page-import .prow label.f{width:100%!important}
+  #page-import .prow .btn{flex:1 1 100%}
+}
+/* <<< PAGES-V118 END */
+
+/* ======================================================================
+   [13] dialogsV95
+   ====================================================================== */
+/* >>> DIALOGSV95 BEGIN — گروه F: دیالوگ‌های عمومی (به‌جز ورود و تغییر رمز v91) و کنترل‌های ویرایش چیدمان (.wkl-*)
+   همهٔ انتخابگرها برای هر صفحه جداگانه پیشوند گرفته‌اند و داخل @media screen‌اند. فقط CSS؛ HTML، JavaScript، API، چاپ و منطق برنامه دست‌نخورده‌اند.
+   بازگشت: حذف کل بلوک <style id="dialogsV95">. */
+@media screen{
+  /* دیالوگ‌های عمومی (openDlg، userDlg، pwDlg، confirmDlg، alertDlg) */
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) .modalBox{border:1px solid var(--line);border-radius:var(--ui-radius-lg);padding:22px 24px;box-shadow:var(--ui-shadow-dialog)}
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) .modalBox h3{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:10px}
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) .modalBox p{color:var(--ink)}
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) .hint{color:var(--muted);line-height:1.9}
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) label.f{font-size:var(--fs-sm);font-weight:600;color:var(--muted);gap:var(--ui-gap-xs)}
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) label.f input:not([type=checkbox]):not([type=radio]):not([type=file]),
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) label.f select{height:40px}
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) #pwInput{height:44px;padding:0 14px;border:1px solid var(--ui-input);border-radius:var(--ui-radius);background:#fff}
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) #pwInput:focus{outline:none;border-color:var(--ui-teal);box-shadow:var(--ui-ring)}
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) .dlg-err:empty{min-height:0!important;margin:0!important}
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) .dlg-err:not(:empty){background:var(--red-soft);border:1px solid var(--ui-red-line);border-radius:var(--ui-radius);padding:10px 14px;color:var(--red-ink)!important;margin-top:8px!important;line-height:1.8}
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) .row-end{margin-top:18px}
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) .row-end .btn{min-height:44px;border-radius:var(--ui-radius);font-weight:700}
+  /* ویرایش چیدمان صفحه: دکمهٔ «✎ ظاهر صفحه»، نوار و کنترل‌های ویرایش (.wkl-*) */
+  .rp-tabs .wkl-entry{color:var(--ui-teal-ink);border-color:var(--ui-teal);background:var(--ui-teal-soft);font-weight:600}
+  .wkl-bar{border-color:var(--ui-teal);background:var(--ui-teal-soft);border-radius:var(--ui-radius-sm);padding:12px 16px}
+  .wkl-bar .chips i{border-color:var(--ui-input)}
+  .wkl-ctl i{background:var(--line-2);border-radius:6px}
+  .wkl-ctl i:hover,
+  .wkl-fctl i:hover,
+  .wkl-bar .chips i:hover{background:var(--ui-teal);color:#fff}
+  .wkl-fctl{border-color:var(--ui-input);border-radius:var(--ui-radius-xs)}
+}
+@media screen and (max-width:640px){
+  .modalWrap:not(#loginWrap):not(:has(input[name="n1"])) .modalBox{padding:20px 18px;max-height:90vh}
+}
+/* <<< DIALOGSV95 END */
+
+
+/* ======================================================================
+   [14] desktop1366V96 + [15] personnelLayoutV97 — نمایشگرهای دسکتاپ کم‌ارتفاع (۱۱۰۱–۱۴۰۰ × حداکثر ۸۰۰)
+   v119: دو بلوک قبلی [14] و [15] با یک media query یکسان پشت سر هم بودند و [16] (بازهٔ بزرگ‌تر ۱۴۴۰×۸۲۰، بعد از این‌ها)
+   بیشتر همان ویژگی‌ها را دوباره می‌نوشت؛ فقط ویژگی‌هایی که واقعاً اثر دارند (همان مقدار نهایی) در یک بلوک مانده‌اند.
+   حذف‌شده‌ها (هرگز برنده نمی‌شدند): .shell (ستون منو، در [16])، .main، .head، .head h1، .card، .card>h2، .stack،
+   max-height پنجره‌ها، و در صفحهٔ پرسنل .pf-layout / .pf-side / .pf-sec / .pf-hero و gap ‏.pf-main.
+   تأیید (۱۰ پیکربندی، v118_3 در برابر v119): offline ۵۴٬۱۰۰ رکورد و --mock ۱۵۳٬۱۴۴ رکورد، صفر تفاوت.
+   نکته: بررسی اول (با حذف‌های اولیه) در حالت compact ۵٬۴۵۴ تفاوت نشان داد؛ علت فقط `.brand b{font-size:14px}` بود که برنده است و اشتباهاً حذف شده بود (برگردانده شد).
+   ====================================================================== */
+@media screen and (min-width:1101px) and (max-width:1400px) and (max-height:800px){
+  .side{padding:12px 9px;gap:4px}
+  .brand{padding:2px 5px 12px;margin-bottom:6px;gap:var(--ui-gap-sm)}
+  .brand .logo{width:34px;height:34px}
+  .brand b{font-size:14px}   /* v119: این قاعده در ادغام اشتباهاً حذف شده بود؛ در 1366×768 برنده است (پایه ۱۵٫۵px) */
+  .nav{gap:2px}
+  .nav button{padding:8px 9px;gap:var(--ui-gap-sm);font-size:var(--fs-xs)}
+  .conn{padding:8px 10px;font-size:var(--fs-xs)}
+  .g2,.g-chart{gap:var(--ui-gap-lg)}
+  .g4{gap:var(--ui-gap-md)}
+  .stat{padding:12px 14px}
+  .stat b{font-size:23px}
+  .tile{width:40px;height:40px}
+  .modalBox{padding:16px 18px}
+  #page-personnel .pf-main{min-width:0}
+}
+/* ---------- منوی جمع‌شونده دسکتاپ (از [15]؛ بیرون از media query بالا) ---------- */
+.desktop-menu-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  margin: 0 0 8px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #cbd5e1;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+
+.desktop-menu-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.desktop-menu-toggle > span:first-child {
+  font-size: 18px;
+  line-height: 1;
+}
+
+@media (min-width: 901px) {
+  .shell {
+    transition: grid-template-columns 0.22s ease;
+  }
+
+  .shell.sidebar-collapsed {
+    grid-template-columns: 70px minmax(0, 1fr);
+  }
+
+  .sidebar-collapsed .side {
+    padding-inline: 8px;
+  }
+
+  .sidebar-collapsed .brand {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .sidebar-collapsed .brand > div:last-child {
+    display: none;
+  }
+
+  .sidebar-collapsed .nav button {
+    justify-content: center;
+    padding-inline: 8px;
+    font-size: 0;
+  }
+
+  .sidebar-collapsed .nav button .kbd {
+    display: none;
+  }
+
+  .sidebar-collapsed .conn {
+    justify-content: center;
+    font-size: 0;
+    padding-inline: 8px;
+  }
+
+  .sidebar-collapsed .desktop-menu-toggle {
+    justify-content: center;
+    padding-inline: 4px;
+  }
+
+  .sidebar-collapsed .menu-toggle-label {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .desktop-menu-toggle {
+    display: none;
+  }
+}
+
+/* ======================================================================
+   [16] compact1366V103
+   ====================================================================== */
+/* >>> COMPACT-1366-V103 BEGIN — بهینه‌سازی مانیتورهای ۱۳۶۶×۷۶۸ (و مشابه: عرض ≤ ۱۴۴۰ و ارتفاع ≤ ۸۲۰)
+   فقط CSS و فقط در @media screen؛ HTML، جاوااسکریپت، چاپ و بلوک‌های قبلی تغییری نکرده‌اند. هدف: جای بیشتر برای محتوا (کم‌کردن فاصله‌ها و اندازه‌ها) و صفحهٔ پرسنل با دو ستون فشرده
+   (فهرست باریک + فرم) و ۴ تا ۵ فیلد در هر ردیف به‌جای ۳. بازگشت: حذف کل این بلوک. */
+@media screen and (min-width:1101px) and (max-width:1440px) and (max-height:820px){
+  body{font-size:var(--fs-md-plus)}
+  .shell{grid-template-columns:200px minmax(0,1fr)}
+  .main{padding:10px 14px 20px}
+  .head{padding:7px 14px;margin-bottom:8px;gap:var(--ui-gap-sm)}
+  .head .t p{display:none}
+  .card{padding:12px 14px}
+  .card>h2{font-size:var(--fs-base);margin-bottom:8px}
+  .stack{gap:var(--ui-gap-md)}
+  .toolbar{gap:var(--ui-gap-sm);margin-bottom:8px}
+  .btn{padding:6px 13px;font-size:var(--fs-sm)}
+  .inp{padding:6px 10px;font-size:var(--fs-md)}
+  table.tbl th,table.tbl td{padding:6px 9px}
+  .wk-sum{gap:var(--ui-gap-sm)}
+  .modalBox{max-height:92vh}
+
+  /* صفحهٔ پرسنل: فهرست باریک + فرم */
+  #page-personnel .pf-layout{grid-template-columns:232px minmax(0,1fr);gap:var(--ui-gap-lg)}
+  #page-personnel .pf-side{padding:9px;gap:var(--ui-gap-xs)}
+  #page-personnel .pf-side>.hint{display:none}
+  #page-personnel #pfChips{gap:4px}
+  #page-personnel #pfChips button{padding:3px 9px;font-size:11.5px}
+  #page-personnel .plist .r{padding:5px 8px;gap:var(--ui-gap-sm);margin-bottom:1px}
+  #page-personnel .plist .r .av{width:30px;height:30px;font-size:11px}
+  #page-personnel .plist .r .nm b{font-size:var(--fs-sm)}
+  #page-personnel .plist .r .nm span{font-size:11px}
+  #page-personnel .plist .r .badge{font-size:10.5px;padding:1px 7px}
+  #page-personnel .pf-main{gap:var(--ui-gap-md)}
+  #page-personnel .pf-hero{padding:10px 14px;gap:var(--ui-gap-lg)}
+  #page-personnel .pf-hero .av.lg{width:54px;height:54px;font-size:19px;border-radius:14px}
+  #page-personnel .pf-hero .who{min-width:200px}
+  #page-personnel .pf-hero .who h2{font-size:19px;margin:0}
+  #page-personnel .pf-hero .who>div:last-child{margin-top:4px!important}
+  #page-personnel .pf-acts{gap:var(--ui-gap-xs)}
+  #page-personnel .pf-acts .btn-hero{padding:5px 10px;font-size:var(--fs-xs)}
+  #page-personnel .pf-sec{padding:10px 14px}
+  #page-personnel .pf-grid{gap:7px 8px}
+  #page-personnel .fld{flex:1 1 168px;padding:5px 10px}
+  #page-personnel .fld.w2{flex-basis:300px}
+}
+/* <<< COMPACT-1366-V103 END */
+
+/* ======================================================================
+   [18] refineV109 — پالایش ظاهری ملایم (نسخهٔ ۱۰۹)
+   فقط روی صفحه (@media screen)؛ چاپ، فیش و پنجره‌های چاپ تغییری نمی‌کنند. همهٔ رنگ‌ها از توکن‌های موجود
+   (--ui-teal، --navy، --line، ...) خوانده می‌شوند تا «ظاهر برنامه (رنگ و اندازه)» در تنظیمات همچنان کار کند.
+   ====================================================================== */
+@media screen{
+  /* v119: توکن‌های این بخش (--bg، --ui-shadow، --ui-head-h) به [01] منتقل شدند */
+  body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+  /* --- سربرگ: عنوان صفحهٔ جاری + نام سامانه --- */
+  /* نسخهٔ ۱۱۱: سربرگ اصلی در دسکتاپ هم دیگر چسبان (sticky) نیست؛ با اسکرول بالا می‌رود تا روی جدول‌ها، سربرگ چسبان جدول‌ها
+     و پنجره‌های بازشو نیفتد و فضای عمودی صفحه (به‌ویژه در ۱۳۶۶×۷۶۸) آزاد بماند. سربرگ چسبان جدول‌ها (.tbl-wrap thead th) حفظ شده است. */
+  .head{position:static;background:var(--card);min-height:var(--ui-head-h)}
+  .head .t{display:flex;flex-direction:column;justify-content:center}
+  .head h1{font-size:18px;line-height:1.45}
+  .head .t p{margin:0;font-size:var(--fs-xs);color:var(--muted)}
+  .period-badge{font-weight:500}
+  .period-badge select{font-weight:700}
+
+  /* --- منوی کناری --- */
+  .side{scrollbar-width:thin;scrollbar-color:var(--navy-3) transparent}
+  .side::-webkit-scrollbar{width:6px}
+  .side::-webkit-scrollbar-thumb{background:var(--navy-3);border-radius:6px}
+  .brand>div:last-child{min-width:0}
+  .brand span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nav button .kbd{opacity:.7}
+
+  /* --- کارت‌ها و عنوان‌ها (رنگ خط، سایه، فاصلهٔ حروف و آیکن عنوان کارت: [20]) --- */
+  .empty{border:1px dashed var(--line);border-radius:var(--ui-radius);color:var(--muted)}
+
+  /* --- داشبورد: کارت‌های شاخص در یک ردیف جا شوند (۵ کارت در عرض ۱۳۶۶ به‌جای ۴+۱) --- */
+  @media (min-width:901px){#page-dashboard .kpi-grid{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}}
+
+  /* --- جدول‌ها: سربرگ چسبان در جدول‌های اسکرول‌دار، ارقام هم‌عرض (ردیف‌های راه‌راه و حالت hover: [20]) --- */
+  .tbl-wrap{scrollbar-width:thin}
+  .tbl-wrap table.tbl thead th{position:sticky;top:0;z-index:1}
+  table.tbl td,table.tbl th{font-variant-numeric:tabular-nums}
+
+  /* --- دکمه‌ها، زبانه‌ها و فیلدها --- */
+  .btn:active:not(:disabled){transform:translateY(1px)}
+  .btn:disabled{cursor:not-allowed}
+  #setTabs{gap:var(--ui-gap-xs);padding:5px;background:var(--card);border:1px solid var(--line);border-radius:calc(var(--ui-radius) + 2px);box-shadow:var(--ui-shadow)}
+  #setTabs button{border-color:transparent;background:transparent}
+  #setTabs button:hover{background:var(--line-2)}
+  #setTabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  ::placeholder{color:color-mix(in srgb,var(--muted) 75%,transparent)}
+
+  /* --- پنجره‌های گفت‌وگو --- */
+  .modalWrap{-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  .modalBox{box-shadow:var(--ui-shadow-raised)}
+
+  /* --- نوار پیشرفت درخواست‌ها (بالای صفحه؛ فقط برای درخواست‌هایی که بیش از ۲۵۰ میلی‌ثانیه طول بکشند) --- */
+  #netBar{position:fixed;inset-inline:0;top:0;height:3px;z-index:3000;pointer-events:none;opacity:0;transition:opacity .2s;overflow:hidden}
+  #netBar::before{content:"";position:absolute;top:0;bottom:0;width:40%;background:linear-gradient(90deg,transparent,var(--ui-teal),transparent);animation:netbar 1.1s ease-in-out infinite}
+  #netBar.on{opacity:1}
+  @keyframes netbar{from{inset-inline-start:-40%}to{inset-inline-start:100%}}
+
+  /* --- نمایش در مانیتورهای ۱۳۶۶×۷۶۸ (هماهنگ با بلوک [16]) --- */
+  @media (min-width:1101px) and (max-width:1440px) and (max-height:820px){
+    :root{--ui-head-h:44px}
+    .head h1{font-size:15.5px}
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+/* ======================================================================
+   [19] darkV111 — حالت تیرهٔ واقعی (نسخهٔ ۱۱۱)
+   جایگزین حالت آزمایشی قبلی (filter:invert روی کل صفحه که عکس‌ها، نمودارها و رنگ‌های وضعیت را وارونه/کدر می‌کرد و
+   روی هر بار رسم صفحه هزینهٔ GPU داشت). حالا فقط توکن‌های رنگ (--bg، --card، --ink، --line، ...) با کلاس html.ui-dark
+   بازتعریف می‌شوند و چند رنگ ثابتِ روشنِ باقی‌مانده در قاعده‌های قدیمی هم این‌جا به توکن‌ها برگردانده می‌شوند.
+   - فقط روی صفحه (@media screen)؛ چاپ و پنجره‌های چاپ (فقط <style id="appCss">) دست‌نخورده‌اند.
+   - «کاغذ»ها روشن می‌مانند تا پیش‌نمایش دقیقاً مثل چاپ باشد: فیش (.sheet)، فرم‌ها (.doc)، دسته‌چک (.cq-paper) و ویرایشگر فرم (#lyDoc).
+   - رنگ اصلی و رنگ منوی کناری از «ظاهر برنامه» همچنان کار می‌کنند (همان متغیرهای --ui-teal و --navy).
+   ====================================================================== */
+@media screen{
+  html.ui-dark{
+    /* v119: تنها جای پالت تیره. --bg، --card، --line، --line-2 و --ui-shadow پیش‌تر این‌جا یک مقدار و در انتهای [20] مقدار دیگری
+       داشتند؛ مقدار نهایی (همان که دیده می‌شد) این‌جاست. #151e2c و #1b2535 در --paper، --tint و --ui-teal-soft عمداً همان رنگ‌های
+       قبلی‌اند (تفاوت عمدی کنتراست سطح‌ها). */
+    color-scheme:dark;
+    --bg:#0b111b;--card:#121a27;--ink:#e3e9f2;--muted:#97a3b6;--line:#253145;--line-2:#182232;
+    --ui-surface-2:#162030;
+    --ui-input:#334156;
+    --paper:#151e2c;--tint:#1b2535;
+    --ui-teal-soft:color-mix(in srgb,var(--ui-teal) 22%,#151e2c);
+    --ui-teal-ink:color-mix(in srgb,var(--ui-teal) 55%,#ffffff);
+    --emerald-soft:#123526;--emerald-ink:#7fe0b0;
+    --blue-soft:#17294a;--amber-soft:#3a2a0c;--amber-ink:#f5c46a;
+    --red-soft:#3a1719;--red-ink:#ff9c9c;--violet-soft:#2a1f4a;
+    --ui-shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px -6px rgba(0,0,0,.5);
+    --ui-shadow-raised:0 2px 4px rgba(0,0,0,.4),0 16px 32px -12px rgba(0,0,0,.65);
+    --ui-shadow-btn:0 1px 2px rgba(0,0,0,.35);
+    --ui-blue-hi:#6c9be0;   /* آبی روشن داشبورد در حالت تیره (نوار کارت، کاشی آیکن، رنگ اول نمودار) */
+  }
+  html.ui-dark body{color:var(--ink)}
+  /* سطح‌ها: کارت، پنجره‌ها، فهرست‌های بازشو، فیلدها و دکمه‌ها */
+  html.ui-dark :is(.modalBox,.pf-sec,.navmodal .box,.pal,.nme-i,.pb-res,.wkl-fctl,.wkl-bar .chips i,.fld.ef,#empList,#page-slips #empList){background:var(--card);color:var(--ink);border-color:var(--line)}
+  html.ui-dark :is(label.f input,label.f select,label.f textarea,.inp,textarea,select){background-color:var(--line-2);color:var(--ink);border-color:var(--ui-input)}
+  html.ui-dark :is(#loginWrap label.f input,.modalWrap label.f input,#pwInput,#page-banks input:not([type=checkbox]):not([type=radio]):not([type=file])){background-color:var(--line-2);color:var(--ink)}
+  /* جست‌وجوهای دارای آیکن ذره‌بین: فقط رنگ زمینه عوض می‌شود تا آیکن (background-image) بماند */
+  html.ui-dark :is(#page-personnel #personnelSearch,#page-mehr .pbar .inp,#page-vefagh .pbar .inp,#page-services .pbar .inp,#page-dcodes #dc-q,#page-changes .pbar .inp,#page-slips #search,#page-cheque .pbar .inp){background-color:var(--line-2)}
+  html.ui-dark .btn{background:var(--card);color:var(--ink);border-color:var(--ui-input)}
+  html.ui-dark .btn:hover:not(:disabled){background:var(--line-2);border-color:color-mix(in srgb,var(--ui-input) 60%,var(--muted))}
+  html.ui-dark .btn-main{background:var(--ui-teal);border-color:var(--ui-teal);color:#fff}
+  html.ui-dark .btn-main:hover:not(:disabled){background:var(--ui-teal-ink);border-color:var(--ui-teal-ink);color:#0d1420}
+  html.ui-dark .btn-blue{color:#fff}
+  html.ui-dark .btn-del{background:var(--card);color:var(--red-ink);border-color:color-mix(in srgb,var(--red) 45%,transparent)}
+  html.ui-dark .chips button{background:var(--card);color:var(--muted);border-color:var(--line)}
+  html.ui-dark .chips button.on{background:var(--ui-teal);border-color:var(--ui-teal);color:#fff}
+  html.ui-dark #setTabs button.on{background:var(--ui-teal);border-color:var(--ui-teal)}
+  html.ui-dark .seg span.on{background:var(--card);color:var(--ink)}
+  html.ui-dark .drop{background:var(--line-2);border-color:var(--ui-input)}
+  html.ui-dark .kc-off{background:var(--line-2)}
+  html.ui-dark .badge.b-member{background:var(--card);color:var(--emerald-ink)}
+  html.ui-dark .pf-dead{background:var(--red-soft);border-color:color-mix(in srgb,var(--red) 40%,transparent);color:var(--red-ink)}
+  html.ui-dark #lyTools{background:#1d1a10}
+  /* جدول‌ها */
+  html.ui-dark table.tbl th{color:var(--muted);background:var(--ui-surface-2);border-bottom-color:var(--line)}
+  html.ui-dark table.tbl tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--line-2) 60%,transparent)}
+  html.ui-dark :is(table.tbl tbody tr:hover td,tr.clk:hover td,.lqRow.clk:hover){background:color-mix(in srgb,var(--ui-teal) 16%,var(--card))}
+  html.ui-dark :is(.ded-tbl tfoot td,#dc-table tfoot td){background:var(--line-2)}
+  /* سبک‌های درون‌خطی روشن که اسکریپت‌ها روی صفحه می‌سازند (به‌جز داخل «کاغذ»ها) */
+  html.ui-dark :is([style*="background:#fff"],[style*="background: #fff"],[style*="background:#ffffff"],[style*="background:white"]):not(:is(.sheet,.doc,.cq-paper,#lyDoc,#preview) *):not(:is(.sheet,.doc,.cq-paper)){background:var(--card)!important;color:var(--ink)}
+  html.ui-dark :is([style*="background:#f8fafc"],[style*="background:#f1f5f9"],[style*="background:#fafbfd"],[style*="background:#fafafa"],[style*="background:#eef2f7"],[style*="background:#f8fbfd"],[style*="background:#e8eef6"],[style*="background:#e8edf4"],[style*="background:#e6edf7"]):not(:is(.sheet,.doc,.cq-paper,#lyDoc,#preview) *){background:var(--line-2)!important}
+  html.ui-dark :is([style*="color:#0f172a"],[style*="color:#1e293b"],[style*="color:#334155"],[style*="color:#111"]):not(:is(.sheet,.doc,.cq-paper,#lyDoc,#preview) *){color:var(--ink)!important}
+  html.ui-dark [style*="color:#64748b"]:not(:is(.sheet,.doc,.cq-paper,#lyDoc,#preview) *){color:var(--muted)!important}
+  /* کاغذها روشن می‌مانند (همانند چاپ) */
+  html.ui-dark :is(.sheet,.doc,.cq-paper){background:#fff;color:#000;color-scheme:light;--line:#e2e8f0;--line-2:#f1f5f9;--ink:#0f172a;--muted:#64748b;--card:#fff;--paper:#fff}
+  html.ui-dark #lyDoc{color-scheme:light}
+  html.ui-dark .cq-paper-wrap{background:var(--line-2)}
+  /* سربرگ، پیام خالی، اسکرول‌بار، placeholder */
+  html.ui-dark .head{background:var(--card);border-color:var(--line)}
+  html.ui-dark .empty{background:var(--line-2);border-color:var(--line);color:var(--muted)}
+  html.ui-dark ::placeholder{color:color-mix(in srgb,var(--muted) 70%,transparent)}
+  html.ui-dark *{scrollbar-color:var(--ui-input) transparent}
+  html.ui-dark a{color:var(--ui-teal-ink)}
+}
+
+/* ======================================================================
+   [20] refreshV115 — نوسازی ظاهری (نسخهٔ ۱۱۵)
+   یک لایهٔ پایانی و برگشت‌پذیر روی همهٔ لایه‌های قبلی؛ فقط روی صفحه (@media screen). چاپ، «کاغذ»ها (.sheet، .doc، .cq-paper)،
+   HTML و JavaScript دست‌نخورده‌اند. اندازه‌ها و فاصله‌های بلوک‌های فشرده‌سازی [14]–[16] (نمایشگر ۱۳۶۶×۷۶۸) عمداً بازنویسی نمی‌شوند؛
+   این لایه بیشتر رنگ، سطح، عمق، سلسله‌مراتب نوشته و حالت‌های تعاملی را یکدست می‌کند.
+   همهٔ رنگ‌ها از توکن‌ها خوانده می‌شوند تا «ظاهر برنامه» (رنگ اصلی، رنگ منو، گوشه‌ها، حالت تیره) همچنان کار کند.
+   بازگشت: کل این بخش را تا انتهای فایل حذف کنید.
+   ====================================================================== */
+@media screen{
+  /* v119: توکن‌های این لایه (--bg، --line، --line-2، --ui-surface-2، سایه‌ها، --ui-ease) به [01] منتقل شدند */
+  body{background:
+    radial-gradient(900px 420px at 100% -10%,color-mix(in srgb,var(--ui-teal) 7%,transparent),transparent 70%),
+    var(--bg);background-attachment:fixed}
+
+  /* ---------- منوی کناری ---------- */
+  .side{background:linear-gradient(180deg,var(--navy) 0%,color-mix(in srgb,var(--navy) 82%,#000) 100%);
+    border-inline-start:1px solid rgba(255,255,255,.04)}
+  .brand{border-bottom-color:rgba(255,255,255,.07)}
+  .brand .logo{background:linear-gradient(135deg,var(--ui-sb-primary),var(--ui-teal));color:#fff;
+    box-shadow:0 6px 16px -6px color-mix(in srgb,var(--ui-sb-primary) 70%,#000)}
+  .brand b{letter-spacing:-.2px}
+  .nav-group{color:var(--ui-sb-muted);font-size:11px;letter-spacing:.2px;border-top-color:transparent;opacity:.85}
+  .nav-group:hover{opacity:1}
+  .nav button{color:color-mix(in srgb,var(--ui-sb-fg) 82%,transparent);opacity:1;font-weight:500;
+    transition:background .18s var(--ui-ease),color .18s var(--ui-ease),box-shadow .18s var(--ui-ease)}
+  .nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+  .nav button.on{background:linear-gradient(90deg,color-mix(in srgb,var(--ui-sb-primary) 10%,transparent),color-mix(in srgb,var(--ui-sb-primary) 24%,transparent));
+    color:#fff;font-weight:700;box-shadow:inset -3px 0 0 var(--ui-sb-primary)}
+  [dir=ltr] .nav button.on{box-shadow:inset 3px 0 0 var(--ui-sb-primary)}
+  .nav button.on svg.i{color:var(--ui-sb-primary)}
+  .nav button .kbd{background:rgba(255,255,255,.07);color:var(--ui-sb-muted);border:1px solid rgba(255,255,255,.06);font-weight:600}
+  .nav-tools button{border-color:rgba(255,255,255,.14)}
+  .conn,.userbox{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07)}
+  .conn .dot.on{box-shadow:0 0 0 3px color-mix(in srgb,var(--emerald) 30%,transparent)}
+  .userbox button{background:rgba(255,255,255,.08)}
+  .userbox button:hover{background:rgba(255,255,255,.16)}
+  .desktop-menu-toggle{border-color:rgba(255,255,255,.08)!important}
+
+  /* ---------- سربرگ صفحه: نوار تخت به‌جای کارت (عنوان مستقیم روی زمینه، جدا با یک خط) ---------- */
+  .shell .main > .head{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;padding-inline:2px}
+  .head h1{font-weight:800;letter-spacing:-.3px}
+  .period-badge{background:var(--card);border:1px solid var(--line);box-shadow:var(--ui-shadow-btn);color:var(--muted);border-radius:var(--ui-radius-pill)}
+  .period-badge select{color:var(--ink)}
+  html .head .period-badge select,html.ui-dark .head .period-badge select{background-color:transparent;border-color:transparent}
+
+  /* ---------- کارت‌ها ---------- */
+  .card,.stat,.toolbar,.pf-sec{border-color:var(--line);box-shadow:var(--ui-shadow)}
+  .card > h2{font-weight:700;letter-spacing:-.15px}
+  .card > h2 .i{box-sizing:content-box;width:16px;height:16px;padding:6px;border-radius:var(--ui-radius-xs);
+    background:var(--ui-teal-soft);color:var(--ui-teal-ink)}
+  .empty{background:var(--ui-surface-2)}
+
+  /* ---------- دکمه‌ها ---------- */
+  .btn{box-shadow:var(--ui-shadow-btn);transition:background .16s var(--ui-ease),border-color .16s,box-shadow .16s,transform .06s}
+  .btn:hover:not(:disabled){border-color:color-mix(in srgb,var(--ui-input) 60%,var(--muted))}
+  .btn-quiet,.btn-quiet:hover{box-shadow:none}
+  .btn-main,.btn-blue,.btn-green{box-shadow:0 1px 2px rgba(16,24,40,.1),inset 0 1px 0 rgba(255,255,255,.08)}
+  .btn-main:hover:not(:disabled),.btn-blue:hover:not(:disabled){box-shadow:0 6px 14px -6px color-mix(in srgb,var(--navy) 60%,transparent)}
+  .kbd{font-variant-numeric:tabular-nums}
+
+  /* ---------- فیلدها، زبانه‌ها و تراشه‌ها ---------- */
+  label.f input,label.f select,.inp{background-color:var(--card)}
+  label.f input:hover:not(:focus),label.f select:hover:not(:focus),.inp:hover:not(:focus){border-color:color-mix(in srgb,var(--ui-input) 55%,var(--muted))}
+  .chips button{transition:background .15s,color .15s,border-color .15s}
+  .chips button:hover:not(.on){border-color:var(--ui-teal);color:var(--ui-teal-ink)}
+  .chips button.on{box-shadow:0 2px 6px -2px color-mix(in srgb,var(--navy) 50%,transparent)}
+  #setTabs button.on{box-shadow:0 2px 6px -2px color-mix(in srgb,var(--navy) 50%,transparent)}
+
+  /* ---------- جدول‌ها (فقط table.tbl) ---------- */
+  table.tbl th{background:var(--ui-surface-2);color:var(--muted);font-size:var(--fs-xs);font-weight:700;letter-spacing:.1px;border-bottom:1px solid var(--line)}
+  table.tbl th:first-child,table.tbl th:last-child{border-radius:0}
+  .tbl-wrap{border-radius:var(--ui-radius-sm)}
+  table.tbl tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--line-2) 40%,transparent)}
+  table.tbl tbody tr:hover td{background:color-mix(in srgb,var(--ui-teal-soft) 60%,var(--card))}
+  table.tbl td.money,table.tbl .money{font-weight:700}
+
+  /* ---------- نشان‌ها ---------- */
+  .badge{font-weight:600;letter-spacing:.1px;box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 14%,transparent)}
+
+  /* ---------- پنجره‌های گفت‌وگو ---------- */
+  .modalWrap{background:color-mix(in srgb,var(--navy) 50%,transparent)}
+  .modalBox{border:1px solid var(--line);border-radius:calc(var(--ui-radius) + 4px)}
+  /* رفع اشکال: در صفحه‌های کم‌ارتفاع (مثلاً ۱۳۶۶×۷۶۸ با بخش «تنظیمات اتصال» باز) بالای پنجرهٔ ورود بیرون از صفحه می‌افتاد و قابل اسکرول نبود.
+     margin:auto در ظرف flex فقط وقتی جا هست وسط‌چین می‌کند و هرگز باعث بریده‌شدن بالای محتوا نمی‌شود. */
+  #loginWrap .modalBox{margin:auto}
+  #loginWrap{background:
+    radial-gradient(700px 380px at 85% 0%,color-mix(in srgb,var(--ui-teal) 16%,transparent),transparent 70%),
+    radial-gradient(600px 360px at 10% 100%,color-mix(in srgb,var(--ui-teal) 6%,transparent),transparent 70%),var(--bg)}
+  #loginWrap .modalBox::before{background-color:var(--ui-teal);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1'/%3E%3Cpath d='M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4'/%3E%3C/svg%3E"),linear-gradient(135deg,var(--ui-sb-primary),var(--ui-teal));
+    background-size:30px 30px,100% 100%;background-position:center,center;background-repeat:no-repeat,no-repeat;
+    box-shadow:0 10px 24px -8px color-mix(in srgb,var(--ui-teal) 60%,transparent)}
+  #loginWrap label.f input{background:var(--card)}
+  #loginWrap #btnLogin{background:var(--ui-teal);border-color:var(--ui-teal);color:#fff}
+  #loginWrap #btnLogin:hover:not(:disabled){background:var(--ui-teal-ink);border-color:var(--ui-teal-ink)}
+
+  /* ---------- داشبورد ---------- */
+  /* سربرگ خوش‌آمد: نوار گرادیانی رنگ منو ← رنگ اصلی، با دکمه‌های میان‌بر شیشه‌ای */
+  #page-dashboard .dash-hero{position:relative;overflow:hidden;border:0;color:#fff;
+    background:radial-gradient(520px 260px at 0% 0%,color-mix(in srgb,var(--ui-sb-primary) 38%,transparent),transparent 70%),
+      linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 55%,color-mix(in srgb,var(--ui-teal) 45%,var(--navy-2)) 100%);
+    box-shadow:0 14px 34px -18px color-mix(in srgb,var(--navy) 85%,transparent)}
+  #page-dashboard .dash-hero::after{content:"";position:absolute;inset-inline-end:-60px;top:-80px;width:260px;height:260px;border-radius:50%;
+    border:40px solid rgba(255,255,255,.04);pointer-events:none}
+  #page-dashboard .dh-main h2{color:#fff;font-weight:800;letter-spacing:-.3px}
+  #page-dashboard .dh-main p{color:color-mix(in srgb,#fff 70%,transparent)}
+  #page-dashboard .dh-chip{background:rgba(255,255,255,.1);color:color-mix(in srgb,#fff 88%,transparent);border:1px solid rgba(255,255,255,.12)}
+  #page-dashboard .dh-chip.warn{background:rgba(245,158,11,.22);color:#fde68a;border-color:rgba(245,158,11,.3)}
+  #page-dashboard button.dh-chip{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.2);cursor:pointer}
+  #page-dashboard button.dh-chip:hover{background:rgba(255,255,255,.26)}
+  #page-dashboard .dh-acts{border-top-color:rgba(255,255,255,.1);position:relative;z-index:1}
+  #page-dashboard .btn-hero{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.16);box-shadow:none;
+    -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+  #page-dashboard .btn-hero:hover:not(:disabled){background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.3)}
+  #page-dashboard .btn-hero .kbd{background:rgba(255,255,255,.14);color:color-mix(in srgb,#fff 80%,transparent)}
+  /* کارت‌های شاخص: رنگ هر کارت (--tone) به‌صورت هالهٔ ملایم در گوشه و نوار باریک بالای کارت */
+  #page-dashboard .kpi{--tone:var(--ui-teal);position:relative;overflow:hidden;
+    background:radial-gradient(160px 110px at 0% 0%,color-mix(in srgb,var(--tone) 9%,transparent),transparent 75%),var(--card);
+    transition:transform .18s var(--ui-ease),box-shadow .18s var(--ui-ease)}
+  #page-dashboard .kpi::before{content:"";position:absolute;inset-inline:0;top:0;height:3px;background:var(--tone);opacity:.85}
+  #page-dashboard .kpi.k-blue{--tone:var(--navy)}#page-dashboard .kpi.k-green{--tone:var(--emerald)}
+  #page-dashboard .kpi.k-amber{--tone:var(--amber)}#page-dashboard .kpi.k-violet{--tone:var(--violet)}
+  #page-dashboard .kpi.k-red{--tone:var(--red)}#page-dashboard .kpi.k-teal{--tone:var(--ui-teal)}
+  #page-dashboard .kpi b{font-weight:800;letter-spacing:-.3px}
+  #page-dashboard .kc{box-shadow:var(--ui-shadow);transition:box-shadow .18s var(--ui-ease),transform .18s var(--ui-ease)}
+  #page-dashboard .kc.clk:hover{transform:translateY(-2px)}
+  #page-dashboard .hb-bar{height:8px;border-radius:var(--ui-radius-pill)}
+  #page-dashboard .hb-bar i{border-radius:var(--ui-radius-pill)}
+  #page-dashboard .al-row{transition:background .15s}
+  #page-dashboard .chart-box text{font-family:inherit}
+}
+
+/* ---------- حالت تیره برای لایهٔ [20] ---------- */
+@media screen{
+  /* پالت تیره: [19] */
+  html.ui-dark body{background:
+    radial-gradient(900px 420px at 100% -10%,color-mix(in srgb,var(--ui-teal) 9%,transparent),transparent 70%),var(--bg);background-attachment:fixed}
+  html.ui-dark .side{background:linear-gradient(180deg,color-mix(in srgb,var(--navy) 70%,#05080e) 0%,#070b12 100%);border-inline-start-color:var(--line)}
+  html.ui-dark .shell .main > .head{background:transparent;border-color:var(--line)}
+  html.ui-dark .period-badge{background:var(--card);border-color:var(--line)}
+  html.ui-dark .modalWrap{background:rgba(2,6,14,.66)}
+  html.ui-dark #loginWrap{background:radial-gradient(700px 380px at 85% 0%,color-mix(in srgb,var(--ui-teal) 14%,transparent),transparent 70%),var(--bg)}
+  html.ui-dark #page-dashboard .btn-hero{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.16)}
+  html.ui-dark #page-dashboard .btn-hero:hover:not(:disabled){background:rgba(255,255,255,.18)}
+  html.ui-dark #page-dashboard .dash-hero{background:radial-gradient(520px 260px at 0% 0%,color-mix(in srgb,var(--ui-teal) 30%,transparent),transparent 70%),
+      linear-gradient(135deg,#0f1a2b 0%,#14223a 55%,color-mix(in srgb,var(--ui-teal) 35%,#14223a) 100%)}
+  html.ui-dark #page-dashboard .kpi.k-blue{--tone:var(--ui-blue-hi)}
+  html.ui-dark #page-dashboard .kpi .tile.t-blue{background:color-mix(in srgb,var(--ui-blue-hi) 22%,var(--card));color:#a9c6f2}
+  /* رفع اشکال: رنگ‌های نمودار داشبورد در حالت تیره از سرمه‌ای تیره روی زمینهٔ تیره به پالت روشن‌تر تغییر می‌کنند (میله‌ها و برچسب‌ها خوانا می‌شوند) */
+  html.ui-dark #page-dashboard{--ui-chart-1:var(--ui-blue-hi);--ui-chart-2:#3cc0b8;--ui-chart-3:#3f6fae;--ui-chart-4:#9fe0da;--ui-chart-soft:#2b3b57}
+  html.ui-dark #page-dashboard .chart-box text[fill="#94a3b8"],html.ui-dark #page-dashboard .chart-box text[fill="#64748b"]{fill:var(--muted)}
+  html.ui-dark #page-dashboard .chart-box text[fill="#cbd5e1"]{fill:var(--line)}
+}
+/* تلفن همراه: میان‌برهای داشبورد در یک ردیف افقیِ قابل‌کشیدن (به‌جای ۷ ردیف دکمه که کل صفحهٔ اول را می‌گرفت) */
+@media screen and (max-width:640px){
+  #page-dashboard .dh-acts{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;
+    -webkit-mask-image:linear-gradient(to left,#000 85%,transparent);mask-image:linear-gradient(to left,#000 85%,transparent)}
+  #page-dashboard .dh-acts::-webkit-scrollbar{display:none}
+  #page-dashboard .btn-hero{flex:0 0 auto;white-space:nowrap}
+  #page-dashboard .dash-hero::after{display:none}
+}
+
+/* v119 (بند ۳۰): آیکون‌های SVG کنترل (.ci) به‌جای گلیف‌های متنی ☰ « ✎ ▾ ‹ › ▲ ▼؛ helper: ico() در core/util.js.
+   نمادهای جهت‌دار راست‌نما کشیده شده‌اند و با dir صفحه برعکس می‌شوند: «جلو» در RTL به چپ، «عقب» و «لبهٔ منو» در RTL به راست (مثل آینه‌شدنِ خودکارِ ‹ › « » در متن RTL). */
+@media screen{
+  html[dir="rtl"] .i.fwd,html[dir="ltr"] .i.back,html[dir="ltr"] .i.edge{transform:scaleX(-1)}
+  svg.i.ci{width:14px;height:14px;vertical-align:middle}   /* svg.i.ci: باید از svg.i{width:20px} قوی‌تر باشد */
+  /* دکمه‌های فقط‌آیکون pager هم‌ارتفاع دکمه‌های متنی (۱ خط + padding ۸ + border ۲ = ۳۱٫۲۵px) */
+  .pager .btn{min-height:calc(1lh + 10px)}
+  .nav-group .ar{display:inline-flex}
+  .nav-group .ar svg.i.ci{width:12px;height:12px;vertical-align:0}
+  .desktop-menu-toggle > span:first-child{display:inline-flex}
+  .desktop-menu-toggle > span:first-child svg.i.ci{width:18px;height:18px;vertical-align:0}
+  .mbar button svg.i.ci{width:22px;height:22px;vertical-align:0}
+  /* دکمهٔ «ویرایش منو»: با flex ارتفاع/عرض قبلی (۳۴٫۴px) حفظ می‌شود؛ بدون آن SVG درون‌خطی خط را ۵px بلندتر می‌کرد */
+  #navEdit{display:flex;align-items:center;justify-content:center;gap:4px}
+  #navEdit svg.i.ci{vertical-align:0}
+}
+
+/* v119 (بند ۳۵): سه سطح روشنِ مانده در حالت تیره (ممیزی همهٔ viewها با داده‌های mock؛ فقط همین‌ها پس‌زمینهٔ روشن داشتند).
+   همه فقط تحت html.ui-dark؛ حالت روشن دست‌نخورده. */
+@media screen{
+  /* ورودی‌های جست‌وجوی فرد (loanform/advance/goods/emdad/life/insurance…): قاعدهٔ صفحه‌محور با background:#fff از قاعدهٔ تیره قوی‌تر بود؛ فقط رنگ را عوض می‌کنیم تا آیکن جست‌وجو بماند */
+  html.ui-dark :is(#page-loans,#page-loanform,#page-advance,#page-emdad,#page-mehr,#page-vefagh,#page-goods,#page-services,#page-life,#page-insurance,#page-changes,#page-cheque) .pbar .inp{background-color:var(--line-2)}
+  /* راهنمای سبز صفحهٔ واردکردن: --emerald-ink در تیره عمداً روشن است (برای متن)، پس پس‌زمینه با متن سفید خوانا نبود */
+  html.ui-dark .banner.green{background:var(--emerald-soft)}
+  /* نوار علل عدم دریافت (مهر): مقدار ثابت #eef2f7 از appCss؛ همان رنگ نوار داشبورد */
+  html.ui-dark .hb-bar{background:var(--line-2)}
+}
+
+/* v120 (بند ۳۸): Focus صفحه‌کلید و کاهش حرکت.
+   - دکمه‌ها و منو در :focus-visible فقط یک هالهٔ ۳px با شفافیت ۲۲٪ داشتند (روی زمینهٔ روشن و منوی تیره به‌سختی دیده می‌شد)؛
+     اکنون حلقهٔ پررنگ --focus هم دارند. فقط Focus با صفحه‌کلید را عوض می‌کند (کلیک با ماوس :focus-visible نمی‌گیرد).
+   - منو و ردیف‌های فهرست پرسنل حلقه را داخل کادر می‌کشند تا overflow نوار کناری/فهرست آن را نبُرد.
+   - prefers-reduced-motion: نوار پیشرفت درخواست‌ها با قاعدهٔ سراسری کاهش حرکت عملاً ناپدید می‌شد (انیمیشن یک‌بار و
+     بیرون از کادر تمام می‌شد)؛ اکنون یک نوار ثابت و بدون حرکت نشان می‌دهد. */
+@media screen{
+  .btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+  .nav button:focus-visible,.plist .r:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+}
+@media screen and (prefers-reduced-motion:reduce){
+  #netBar::before{animation:none;inset-inline-start:0;width:100%;opacity:.6}
+}

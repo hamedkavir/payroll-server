@@ -1,0 +1,12 @@
+-- بستن فایل حقوق: تاریخ بستن حقوق هر ماه (معادل ساخت خودکار در ensureTables.js)
+CREATE TABLE IF NOT EXISTS payroll_closings (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  year SMALLINT UNSIGNED NOT NULL,
+  month TINYINT UNSIGNED NOT NULL,
+  close_date VARCHAR(10) NOT NULL,
+  note VARCHAR(255) NOT NULL DEFAULT '',
+  created_by VARCHAR(100) NOT NULL DEFAULT '',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_closing_ym (year, month)
+) ENGINE=InnoDB;
